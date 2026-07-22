@@ -39,24 +39,41 @@ class EmergencyScreen extends ConsumerWidget {
               AppSpacing.huge,
             ),
             children: <Widget>[
-              SectionCard(
-                color: AppColors.dangerTint,
-                borderColor: AppColors.dangerTint,
+              Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: AppColors.danger,
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
+                ),
                 child: Row(
                   children: <Widget>[
                     const Icon(
                       Icons.emergency_rounded,
-                      color: AppColors.danger,
-                      size: 22,
+                      color: AppColors.onPrimary,
+                      size: 24,
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
-                      child: Text(
-                        'Show this screen to a first responder.',
-                        style: text.titleSmall?.copyWith(
-                          color: AppColors.danger,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Emergency card',
+                            style: text.titleMedium?.copyWith(
+                              color: AppColors.onPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Show this screen to a first responder.',
+                            style: text.bodyMedium?.copyWith(
+                              color: AppColors.onPrimary.withValues(
+                                alpha: 0.88,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -78,11 +95,19 @@ class EmergencyScreen extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.xl),
                     const Divider(),
                     const SizedBox(height: AppSpacing.lg),
-                    _Block(
-                      title: 'Allergies',
-                      items: value.allergies,
-                      tone: StatusTone.critical,
-                      emptyLabel: 'None recorded',
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      decoration: BoxDecoration(
+                        color: AppColors.dangerTint,
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                      ),
+                      child: _Block(
+                        title: 'Allergies',
+                        items: value.allergies,
+                        tone: StatusTone.critical,
+                        emptyLabel: 'None recorded',
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     _Block(
