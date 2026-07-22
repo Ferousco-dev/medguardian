@@ -64,11 +64,25 @@ flutter pub get
 flutter run
 ```
 
-Point the client at a backend by passing the base URL at build time:
+With no backend URL supplied the app runs on a built-in demo dataset, so it is fully explorable straight after clone. Point it at a real backend by passing the base URL at build time:
 
 ```bash
 flutter run --dart-define=API_BASE_URL=https://your-backend.example.com
 ```
+
+That single flag is the only change needed to move from demo data to live data. Repository selection happens in `lib/app/providers.dart`.
+
+## Releases
+
+Every push to `main` runs analysis and tests, builds a release APK, tags the build and publishes it to [Releases](https://github.com/Ferousco-dev/medguardian/releases). Universal and per-ABI APKs are attached to each release.
+
+## Documentation
+
+| Document | Purpose |
+| --- | --- |
+| [`docs/BACKEND_SPEC.md`](docs/BACKEND_SPEC.md) | Complete API contract. Build these endpoints, return a base URL, and the app works |
+| [`docs/DESIGN_REFERENCE.md`](docs/DESIGN_REFERENCE.md) | Design patterns adopted and deliberately rejected |
+| [`docs/APP_ICON_PROMPT.md`](docs/APP_ICON_PROMPT.md) | Prompt and wiring for the launcher icon |
 
 ## Design
 
