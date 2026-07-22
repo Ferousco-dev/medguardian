@@ -72,6 +72,20 @@ class _IntroState extends StatelessWidget {
               AppSpacing.xxl,
             ),
             children: <Widget>[
+              Container(
+                height: 52,
+                width: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryTint,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                ),
+                child: const Icon(
+                  Icons.description_outlined,
+                  size: 25,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
               Text(
                 'Give your doctor the whole picture',
                 style: text.headlineSmall,
@@ -188,6 +202,23 @@ class _SummaryView extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        const Icon(
+                          Icons.verified_outlined,
+                          size: 15,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          'MEDGUARDIAN CLINICAL SUMMARY',
+                          style: text.labelSmall?.copyWith(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
                     Text(summary.patientName, style: text.titleLarge),
                     const SizedBox(height: 2),
                     Text(
