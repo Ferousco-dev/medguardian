@@ -3,6 +3,7 @@ abstract final class ApiEndpoints {
   static const String login = '/auth/login';
   static const String logout = '/auth/logout';
   static const String me = '/auth/me';
+  static const String forgotPassword = '/auth/forgot-password';
 
   static const String twin = '/twin';
   static const String seedDemo = '/twin/seed-demo';

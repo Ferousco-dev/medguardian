@@ -15,6 +15,8 @@ abstract interface class AuthRepository {
 
   Future<UserAccount?> currentUser();
 
+  Future<void> requestPasswordReset(String email);
+
   Future<void> signOut();
 }
 
@@ -70,6 +72,14 @@ class RemoteAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> requestPasswordReset(String email) async {
+    await _client.post<Map<String, dynamic>>(
+      ApiEndpoints.forgotPassword,
+      body: <String, dynamic>{'email': email},
+    );
+  }
+
+  @override
   Future<void> signOut() async {
     await _tokenStore.clear();
   }
@@ -116,6 +126,11 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<UserAccount?> currentUser() async => _session;
+
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    await Future<void>.delayed(_latency);
+  }
 
   @override
   Future<void> signOut() async {

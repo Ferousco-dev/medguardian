@@ -10,6 +10,7 @@ import '../../../shared/widgets/async_view.dart';
 import '../application/auth_controller.dart';
 import '../domain/validators.dart';
 import 'widgets/auth_header.dart';
+import 'widgets/forgot_password_sheet.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
@@ -109,7 +110,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () => ForgotPasswordSheet.show(
+                        context,
+                        initialEmail: _email.text.trim(),
+                      ),
                       child: const Text('Forgot password'),
                     ),
                   ),
