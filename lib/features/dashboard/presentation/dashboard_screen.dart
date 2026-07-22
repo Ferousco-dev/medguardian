@@ -156,7 +156,10 @@ class DashboardScreen extends ConsumerWidget {
                     children: <Widget>[
                       for (int i = 0; i < value.length; i++) ...<Widget>[
                         if (i > 0) const SizedBox(height: AppSpacing.md),
-                        InsightCard(insight: value[i]),
+                        EntranceFade(
+                          index: i,
+                          child: InsightCard(insight: value[i]),
+                        ),
                       ],
                     ],
                   );

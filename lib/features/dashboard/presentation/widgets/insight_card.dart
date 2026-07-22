@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../data/models/health_insight.dart';
-import '../../../../shared/widgets/section_card.dart';
+import '../../../../shared/widgets/entrance.dart';
 import '../../../../shared/widgets/status_pill.dart';
 
 class InsightCard extends StatelessWidget {
@@ -26,8 +27,8 @@ class InsightCard extends StatelessWidget {
   };
 
   IconData get _icon => switch (insight.severity) {
-    InsightSeverity.positive => Icons.check_circle_outline,
-    InsightSeverity.informational => Icons.info_outline,
+    InsightSeverity.positive => Icons.check_circle_outline_rounded,
+    InsightSeverity.informational => Icons.info_outline_rounded,
     InsightSeverity.watch => Icons.trending_up_rounded,
     InsightSeverity.urgent => Icons.priority_high_rounded,
   };
@@ -36,37 +37,88 @@ class InsightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
 
-    return SectionCard(
+    return PressableScale(
       onTap: onTap,
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          StatusPill(label: _toneLabel, tone: _tone, icon: _icon),
-          const SizedBox(height: AppSpacing.md),
-          Text(insight.title, style: text.titleMedium),
-          const SizedBox(height: AppSpacing.sm),
-          Text(insight.body, style: text.bodyMedium),
-          if (insight.recommendation != null) ...<Widget>[
-            const SizedBox(height: AppSpacing.lg),
-            const Divider(),
-            const SizedBox(height: AppSpacing.lg),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 16,
-                  color: _tone.foreground,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: AppColors.border),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Container(width: 4, color: _tone.foreground),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.xl),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            height: 26,
+                            width: 26,
+                            decoration: BoxDecoration(
+                              color: _tone.background,
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                            ),
+                            child: Icon(
+                              _icon,
+                              size: 15,
+                              color: _tone.foreground,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            _toneLabel,
+                            style: text.labelMedium?.copyWith(
+                              color: _tone.foreground,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(insight.title, style: text.titleMedium),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(insight.body, style: text.bodyMedium),
+                      if (insight.recommendation != null) ...<Widget>[
+                        const SizedBox(height: AppSpacing.lg),
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceMuted,
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 15,
+                                color: AppColors.primary,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: Text(
+                                  insight.recommendation!,
+                                  style: text.titleSmall,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(insight.recommendation!, style: text.titleSmall),
-                ),
-              ],
-            ),
-          ],
-        ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
