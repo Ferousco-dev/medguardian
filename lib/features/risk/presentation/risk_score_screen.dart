@@ -8,11 +8,12 @@ import '../../../app/routes.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../data/models/risk_score.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/section_card.dart';
 import '../../../shared/widgets/section_heading.dart';
 import '../../../shared/widgets/status_pill.dart';
-import '../../dashboard/presentation/widgets/risk_score_card.dart';
 
 class RiskScoreScreen extends ConsumerWidget {
   const RiskScoreScreen({super.key});
@@ -45,7 +46,7 @@ class RiskScoreScreen extends ConsumerWidget {
                 AppSpacing.huge,
               ),
               children: <Widget>[
-                _ScoreHero(score: value),
+                EntranceFade(index: 0, child: _ScoreHero(score: value)),
                 const SizedBox(height: AppSpacing.xxl),
                 const SectionHeading(title: 'Raising your risk'),
                 _FactorList(factors: raising, tone: StatusTone.critical),
@@ -78,36 +79,87 @@ class _ScoreHero extends StatelessWidget {
 
   final RiskScore score;
 
-  StatusTone get _tone => switch (score.band) {
-    RiskBand.low => StatusTone.positive,
-    RiskBand.moderate => StatusTone.caution,
-    RiskBand.high => StatusTone.critical,
-    RiskBand.critical => StatusTone.critical,
-  };
-
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
     final int? delta = score.delta;
 
-    return SectionCard(
+    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xxl),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.22),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Column(
         children: <Widget>[
-          Text('${score.score}', style: AppTypography.numeric(fontSize: 76)),
+          AnimatedCounter(
+            value: score.score,
+            style: AppTypography.numeric(
+              fontSize: 76,
+              color: AppColors.onPrimary,
+            ),
+          ),
           const SizedBox(height: AppSpacing.xs),
-          Text('out of 100', style: text.bodyMedium),
+          Text(
+            'out of 100',
+            style: text.bodyMedium?.copyWith(
+              color: AppColors.onPrimary.withValues(alpha: 0.7),
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
-          StatusPill(label: score.band.label, tone: _tone),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: 7,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.onPrimary.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+            ),
+            child: Text(
+              score.band.label,
+              style: text.labelMedium?.copyWith(color: AppColors.onPrimary),
+            ),
+          ),
           const SizedBox(height: AppSpacing.xl),
-          ScoreBar(value: score.score / 100, tone: _tone),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                begin: 0,
+                end: (score.score / 100).clamp(0, 1),
+              ),
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.easeOutCubic,
+              builder: (BuildContext context, double current, _) {
+                return LinearProgressIndicator(
+                  value: current,
+                  minHeight: 8,
+                  backgroundColor: AppColors.onPrimary.withValues(alpha: 0.22),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.onPrimary,
+                  ),
+                );
+              },
+            ),
+          ),
           if (delta != null) ...<Widget>[
             const SizedBox(height: AppSpacing.lg),
             Text(
               delta >= 0
                   ? 'Up $delta points since last month'
                   : 'Down ${delta.abs()} points since last month',
-              style: text.bodyMedium,
+              style: text.bodyMedium?.copyWith(
+                color: AppColors.onPrimary.withValues(alpha: 0.85),
+              ),
             ),
           ],
         ],

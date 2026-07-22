@@ -5,7 +5,6 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../data/models/risk_score.dart';
 import '../../../../shared/widgets/entrance.dart';
-import '../../../../shared/widgets/status_pill.dart';
 
 /// The one thing on the dashboard that is meant to catch the eye.
 ///
@@ -228,33 +227,6 @@ class _ScoreTrack extends StatelessWidget {
             valueColor: const AlwaysStoppedAnimation<Color>(
               AppColors.onPrimary,
             ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class ScoreBar extends StatelessWidget {
-  const ScoreBar({super.key, required this.value, required this.tone});
-
-  final double value;
-  final StatusTone tone;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.pill),
-      child: TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 0, end: value.clamp(0, 1)),
-        duration: const Duration(milliseconds: 900),
-        curve: Curves.easeOutCubic,
-        builder: (BuildContext context, double current, _) {
-          return LinearProgressIndicator(
-            value: current,
-            minHeight: 8,
-            backgroundColor: AppColors.surfaceMuted,
-            valueColor: AlwaysStoppedAnimation<Color>(tone.foreground),
           );
         },
       ),
