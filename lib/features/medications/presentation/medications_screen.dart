@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/medication.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/section_card.dart';
 import '../../../shared/widgets/status_pill.dart';
 
@@ -52,8 +53,11 @@ class MedicationsScreen extends ConsumerWidget {
                 AppSpacing.huge,
               ),
               children: <Widget>[
-                for (final Medication medication in active) ...<Widget>[
-                  MedicationCard(medication: medication),
+                for (int i = 0; i < active.length; i++) ...<Widget>[
+                  EntranceFade(
+                    index: i,
+                    child: MedicationCard(medication: active[i]),
+                  ),
                   const SizedBox(height: AppSpacing.lg),
                 ],
                 if (past.isNotEmpty) ...<Widget>[
@@ -93,6 +97,24 @@ class MedicationCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
+              Container(
+                height: 42,
+                width: 42,
+                decoration: BoxDecoration(
+                  color: medication.isActive
+                      ? AppColors.primaryTint
+                      : AppColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Icon(
+                  Icons.medication_liquid_outlined,
+                  size: 20,
+                  color: medication.isActive
+                      ? AppColors.primary
+                      : AppColors.textTertiary,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
