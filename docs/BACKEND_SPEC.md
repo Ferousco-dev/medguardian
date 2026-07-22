@@ -677,7 +677,82 @@ Optional. The client currently ships this content locally, so the library works 
 
 ---
 
-## 12. Hospitals
+## 12. Data sources and where numbers come from
+
+> Ontomorph: **Twin Core** (seed), **Events**, **Metrics**, **FHIR**.
+
+This section exists because of one rule the whole product rests on:
+
+**MedGuardian never produces a measurement. It only records one, then derives everything else from it.**
+
+Trends, risk scores, insights and simulations are all computed. The raw numbers must enter from outside, through exactly four doors: the patient types them, a device sends them, a clinic sends them, or a lab report is parsed. The client shows the user which door each reading came through, so none of these may be faked server-side.
+
+### `GET /sources`
+
+Lists every source, connected or not.
+
+```json
+[
+  {
+    "id": "src_health_connect",
+    "name": "Health Connect",
+    "kind": "wearable",
+    "provider": "health_connect",
+    "is_connected": false,
+    "last_synced_at": null,
+    "supplied_markers": ["resting_heart_rate", "bmi", "oxygen_saturation"],
+    "reading_count": 0
+  }
+]
+```
+
+`kind` is one of `manual`, `wearable`, `clinic`, `lab`, `demo`. Unknown values fall back to `manual`.
+
+**`supplied_markers` must be honest.** A wrist wearable cannot measure fasting glucose or blood pressure. Health Connect realistically supplies heart rate, steps, weight and sometimes SpO2. If you list `blood_glucose` under a fitness band, the app shows the user a promise it cannot keep. Only list what that source genuinely writes.
+
+### `POST /sources/{id}/connect` and `POST /sources/{id}/disconnect`
+
+Response `200`: the updated source object.
+
+Connect is where the OAuth or pairing handshake for that provider happens. Disconnect stops future syncs and **must not delete readings already on the twin**, the client tells the user exactly that.
+
+### `POST /sources/{id}/sync`
+
+Pulls whatever is new from that source and writes it onto the twin as readings and events.
+
+Response `200`:
+```json
+{
+  "source_id": "src_health_connect",
+  "readings_added": 12,
+  "events_added": 0,
+  "synced_at": "2026-07-22T09:40:00Z"
+}
+```
+
+Return zeros rather than an error when there is nothing new, the client has wording for that case.
+
+Every reading written by a sync must carry `source` set to that source's `kind`, so provenance survives into `GET /biomarkers`.
+
+### `POST /imports/fhir`
+
+Accepts a FHIR R4 `Bundle` and merges it into the twin. Same response shape as sync.
+
+Map `Observation` to biomarker readings, `Condition` to diagnosis events, `MedicationStatement` to medications, `AllergyIntolerance` to twin allergies, `Encounter` to visit events. Ontomorph can seed a twin from a FHIR bundle directly, so prefer that over parsing by hand.
+
+**Deduplicate on re-import.** Users will import the same bundle twice. Match on resource id plus effective date and skip what is already present, otherwise the trend charts grow duplicate points.
+
+### `POST /twin/seed-demo`
+
+Seeds the authenticated user's twin with a realistic history: roughly six months of biomarker readings, plus events, medications and allergies. Response `204`.
+
+This is what the demo account uses, and it is the single highest-value endpoint here. Readings it creates must carry `source: "demo"` so nothing pretends to be a real measurement.
+
+Ontomorph exposes demo seeding on Twin Core. **Use the platform's own seeding rather than inventing fixtures**, because "use of the platform" is one of four equally weighted judging criteria and hand-rolled fake data scores nothing on it.
+
+---
+
+## 13. Hospitals
 
 ### `GET /hospitals/nearby?lat=6.45&lng=3.42`
 
@@ -705,7 +780,7 @@ Sort nearest first. `image_url` must be a plain HTTPS image URL, the client appe
 
 ---
 
-## 13. Build order
+## 14. Build order
 
 If time is short, build in this order. The client degrades gracefully and shows an error state per section, so partial delivery still demos.
 
@@ -718,12 +793,15 @@ If time is short, build in this order. The client degrades gracefully and shows 
 7. `POST /clinical-summary`, `GET /fhir/export`
 8. `POST /simulations`
 9. `GET /medications`, `GET /hospitals/nearby`, `POST /access-grants`
+10. `GET /sources`, `POST /sources/{id}/sync`, `POST /imports/fhir`
 
 Steps 1 to 6 cover the core demo. Everything after that is upside.
 
+**Do `POST /twin/seed-demo` early, out of order.** It is a couple of hours of work and it makes every other screen demonstrable immediately, because the app has real history to draw trends from. Without it the reviewer sees empty charts.
+
 ---
 
-## 14. Checklist before handing back the URL
+## 15. Checklist before handing back the URL
 
 - [ ] HTTPS, with a valid certificate. Android blocks plain HTTP by default.
 - [ ] CORS is irrelevant for the mobile client, ignore it unless a web build is added.
@@ -740,5 +818,10 @@ Steps 1 to 6 cover the core demo. Everything after that is upside.
 - [ ] `POST /chat` sets `is_emergency` for the same patterns.
 - [ ] `POST /chat` replies quote real values from the record, not generic advice.
 - [ ] At least one seeded demo account exists with roughly six months of history, so the trends and projections have something to show.
+- [ ] `POST /twin/seed-demo` works and its readings carry `source: "demo"`.
+- [ ] Every biomarker reading carries a `source`, never null.
+- [ ] `supplied_markers` on each source lists only what that source can really measure.
+- [ ] Disconnecting a source leaves existing readings on the twin.
+- [ ] Re-importing the same FHIR bundle does not duplicate readings.
 
 Send back the base URL and the demo account credentials. That is all the client needs.
