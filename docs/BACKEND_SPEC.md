@@ -8,6 +8,19 @@ flutter build apk --release --dart-define=API_BASE_URL=https://your-backend.exam
 
 Nothing else in the client needs to be touched. Every path the client calls is declared in `lib/core/network/api_endpoints.dart` and mirrors this file exactly.
 
+**Read [`ONTOMORPH_PLATFORM.md`](ONTOMORPH_PLATFORM.md) first.** It documents the real Ontomorph and HOLON API surface. Your job is mostly to be a thin, authenticated proxy in front of it, not to reinvent it. Each section below names the Ontomorph endpoint that should back it.
+
+### Why the backend exists at all
+
+The mobile client must never hold the Ontomorph API key or the HOLON key. Your service holds both, maps our user accounts onto twins, and issues grants on the patient's behalf. Two keys:
+
+| Key | Targets | Header |
+| --- | --- | --- |
+| `DTP_KEY` | Twin Core | `Authorization: Bearer <key>` |
+| `HOLON_KEY` | `https://holon-api.ontomorph.com` | `Authorization: Bearer <key>` |
+
+Do not build a health database. Ontomorph is the database. You should be storing little more than: user credentials, the mapping from user to twin id, and issued grant ids.
+
 ---
 
 ## 1. Ground rules
@@ -105,7 +118,13 @@ Invalidate the token server-side. Response `204`. The client clears local storag
 
 ## 3. Twin Core
 
-> Ontomorph: **Twin Core**. Create a real Ontomorph twin here and store the mapping from your `user.id` to the Ontomorph twin id and DID.
+> Ontomorph: `POST /twins/`, `GET /twins/{id}`, `PATCH /twins/{id}`.
+>
+> Create a real Ontomorph twin and store the mapping from your `user.id` to the twin UUID. There is also `POST /twins/seed-demo` which seeds a demo patient, which is the fastest way to get a populated twin for the demo account.
+>
+> The platform returns `personalisationProfile { age, sex, heightCm, weightKg, bmi, skinTone, ancestry }` and a DID of the form `did:dtp:{uuid}`. Note that **age is a number and BMI is computed for you**, so pass both straight through rather than recomputing. Our client stores date of birth locally and can send either.
+>
+> Platform `sex` accepts `male`, `female`, `intersex`. Our client has a fourth option, `undisclosed`, for users who skip the question. Hold that on your side and omit `sex` from the platform call when it is set.
 
 ### `POST /twin`
 
@@ -178,7 +197,11 @@ Because the flow is skippable and resumable, this endpoint gets called repeatedl
 
 ## 4. Health Events
 
-> Ontomorph: **Health Events** and **Hidden Events**.
+> Ontomorph: `POST|GET /twins/{id}/events/`, `DELETE /twins/{id}/events/{eventId}`, `GET /twins/{id}/events/emergency-card`, and `POST|GET|DELETE /twins/{id}/hidden-events/`.
+>
+> An Ontomorph event carries **a code, a value, and the body system it affects**. Our `body_system` field maps to that directly: `cardiovascular`, `nervous`, `endocrine`, `skeletal`, `immune` and so on. Populate it, because it is what makes the event addressable on the 3D anatomy later.
+>
+> `GET /twins/{id}/events/conflicts` surfaces contradictory events and is worth exposing if you have time.
 
 ### `GET /events`
 
@@ -205,7 +228,7 @@ Response `200`:
 
 `severity` is one of: `none`, `mild`, `moderate`, `severe`, `critical`. Unknown values fall back to `none`.
 
-`clinical_code` is optional. Populate it from Ontomorph **Clinical Mappings** (ICD-10, SNOMED, LOINC) where you can. The client renders it as a small pill and it makes the app look considerably more credible in the demo.
+`clinical_code` is optional. Populate it via HOLON `mappings.translate(code, fromVocabulary, toVocabulary)`, which spans 19 vocabularies including SNOMED CT, LOINC, RxNorm and ICD-10. The client renders it as a small pill and it makes the app look considerably more credible in the demo.
 
 `metadata` is a free-form object. Send `{}` if unused.
 
@@ -340,7 +363,9 @@ Response `200`:
 
 ## 7. Biomarkers
 
-> Ontomorph: **Biomarker Trends** and **Metrics**.
+> Ontomorph: `GET /twins/{id}/biomarker-trends/` and `GET /twins/{id}/biomarker-trends/{loincCode}?window_days=90`.
+>
+> **Trends are keyed by LOINC code, not by a name.** The platform computes the trend direction, so do not write your own. HOLON supplies the reference ranges: `GET /reference-ranges/{loincCode}?age={age}&sex={sex}` returns ranges stratified by age and sex, which is what our client displays under each chart.
 
 ### `GET /biomarkers`
 
@@ -366,7 +391,19 @@ Response `200`:
 
 `trend` is one of `improving`, `stable`, `worsening`. Compute it from the series using Ontomorph Biomarker Trends rather than a naive last-two comparison.
 
-Codes the client expects, and pins to the dashboard: `blood_pressure_systolic`, `blood_glucose`, `bmi`, `resting_heart_rate`. Also supported: `hba1c`, `total_cholesterol`. Additional codes render fine on the biomarkers screen, they just are not pinned to the dashboard.
+LOINC codes the client uses:
+
+| Biomarker | LOINC | Pinned to dashboard |
+| --- | --- | --- |
+| Systolic blood pressure | `8480-6` | yes |
+| Fasting glucose | `1558-6` | yes |
+| Body mass index | `39156-5` | yes |
+| Resting heart rate | `8867-4` | yes |
+| HbA1c | `4548-4` | no |
+| Total cholesterol | `2093-3` | no |
+| Oxygen saturation | `2708-6` | no |
+
+Additional LOINC codes render fine on the biomarkers screen, they are simply not pinned to the dashboard grid.
 
 `reference_low` and `reference_high` drive the dashed range lines on the chart and the out-of-range highlighting. Send them whenever clinically meaningful.
 
@@ -393,7 +430,13 @@ Optional. Reserved for a per-biomarker detail view. Not called by the current cl
 
 ## 8. Risk, insights and simulation
 
-> Ontomorph: **Insights**, **Alert Rules**, **Analytics**, **Simulations**.
+> Ontomorph: `GET /insights/`, `GET /insights/stream` (server-sent events), `POST /twins/{id}/alert-rules/`, `POST /twins/{id}/alert-rules/evaluate`, `POST /simulations/`, `GET /simulations/{id}`, `GET /v1/analytics/readiness/{patientId}`, `POST /v1/cdss/calculate-news2`.
+>
+> **Use alert rules rather than hard-coded thresholds.** A rule takes `loincCode`, `loincDisplay`, `ruleType`, `operator` and `thresholdValue`. Create sensible defaults when a twin is created, then call `evaluate` after every new reading. That call is what should drive our emergency detection.
+>
+> **NEWS2 is available as a scored endpoint** at `POST /v1/cdss/calculate-news2`. It is a recognised clinical early warning score, and grounding our risk number in it is far more defensible than a bespoke calculation. If you use it, return the NEWS2 value in `metadata` alongside our 0 to 100 score.
+>
+> `GET /simulations/{id}/animation` returns a rendered animation of the projection. We do not consume it yet, but do not discard it, it is a strong demo asset.
 
 ### `GET /risk-score`
 
@@ -491,7 +534,11 @@ Response `200`:
 
 ## 9. Medications
 
-> Ontomorph: **Events** of type `medication`, plus a drug reference source.
+> Ontomorph: events of type `medication`. **Interactions and warnings must come from HOLON**, not from a list you write.
+>
+> `GET https://holon-api.ontomorph.com/interactions/check-list` against the patient's full medication list checks it against 1.7 million known interactions. `GET /concepts?q={name}&domain=Drug` resolves a drug name to a concept id first.
+>
+> This is the single cheapest way to score on the "use of the platform" criterion, and it is also the difference between a real safety check and a hard-coded string.
 
 ### `GET /medications`
 
@@ -526,7 +573,11 @@ Returns a single medication object for a name search. Response `200`.
 
 ## 10. Clinical summary, FHIR and sharing
 
-> Ontomorph: **Provider APIs**, **Clinical Summary**, **FHIR Export**, **Temporary Access**.
+> Ontomorph: `GET /provider/twins/{id}/clinical-summary`, `POST /fhir/export/` then `GET /fhir/export/{jobId}` then `GET /fhir/export/{jobId}/file/{type}`, and the grants API for temporary access.
+>
+> **FHIR export is an asynchronous job on the platform.** Kick it off, poll the job, then fetch the file. Our client expects a single synchronous call that returns the bundle, so absorb the polling on your side and only respond once the file is ready.
+>
+> **Temporary access must be a real Ontomorph grant**, created with a scope list and an `expiresAt`, and revocable. Do not invent your own sharing mechanism, the platform's consent model is one of the things being judged. Map our `duration_minutes` onto `expiresAt`, and return the scopes you requested so the client can show the patient exactly what they granted.
 
 ### `POST /clinical-summary`
 
