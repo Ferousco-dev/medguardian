@@ -1,14 +1,12 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// Keeps the access token in platform secure storage.
-///
-/// Health data is sensitive, so the token never goes into shared preferences.
 class TokenStore {
   TokenStore({FlutterSecureStorage? storage})
-      : _storage = storage ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
-            );
+    : _storage =
+          storage ??
+          const FlutterSecureStorage(
+            aOptions: AndroidOptions(encryptedSharedPreferences: true),
+          );
 
   static const String _key = 'medguardian.access_token';
 

@@ -6,11 +6,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/brand_mark.dart';
 
-/// First screen shown on launch.
-///
-/// It holds while the app decides where the user belongs, then hands off to
-/// onboarding or the dashboard. The destination is a placeholder until the
-/// auth session provider lands.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -32,11 +27,10 @@ class _SplashScreenState extends State<SplashScreen>
     curve: Curves.easeOut,
   );
 
-  late final Animation<Offset> _rise =
-      Tween<Offset>(
-        begin: const Offset(0, 0.12),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+  late final Animation<Offset> _rise = Tween<Offset>(
+    begin: const Offset(0, 0.12),
+    end: Offset.zero,
+  ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
   @override
   void initState() {
@@ -79,10 +73,7 @@ class _SplashScreenState extends State<SplashScreen>
                     const SizedBox(height: AppSpacing.xxl),
                     Text('MedGuardian', style: text.headlineMedium),
                     const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'Your health, watched over',
-                      style: text.bodyMedium,
-                    ),
+                    Text('Your health, watched over', style: text.bodyMedium),
                   ],
                 ),
               ),

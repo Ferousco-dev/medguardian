@@ -1,9 +1,5 @@
 import 'package:dio/dio.dart';
 
-/// A failure the UI can render directly.
-///
-/// Dio errors are translated into one of these at the client boundary so no
-/// widget or repository ever has to know about `DioException`.
 class ApiException implements Exception {
   const ApiException({
     required this.message,
@@ -22,7 +18,8 @@ class ApiException implements Exception {
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.transformTimeout:
         return const ApiException(
-          message: 'The request took too long. Check your connection and try '
+          message:
+              'The request took too long. Check your connection and try '
               'again.',
           kind: ApiErrorKind.timeout,
         );
@@ -52,8 +49,6 @@ class ApiException implements Exception {
     }
   }
 
-  /// Prefers the API's own error text so backend validation messages reach the
-  /// user unchanged.
   static String _messageFromResponse(Response<dynamic>? response) {
     final dynamic data = response?.data;
     if (data is Map<String, dynamic>) {
@@ -71,11 +66,4 @@ class ApiException implements Exception {
   String toString() => 'ApiException($statusCode): $message';
 }
 
-enum ApiErrorKind {
-  network,
-  timeout,
-  unauthorised,
-  server,
-  cancelled,
-  unknown,
-}
+enum ApiErrorKind { network, timeout, unauthorised, server, cancelled, unknown }

@@ -5,12 +5,6 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/widgets/section_card.dart';
 
-/// Onboarding illustrations.
-///
-/// Each one is a small, honest preview of a real screen in the app rather than
-/// a stock drawing, so what the user sees on page one is what they get on the
-/// dashboard.
-
 class TwinPreviewVisual extends StatelessWidget {
   const TwinPreviewVisual({super.key});
 
@@ -61,17 +55,25 @@ class TwinPreviewVisual extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           const Row(
             children: <Widget>[
-              Expanded(child: _MetricTile(label: 'BMI', value: '22.4')),
+              Expanded(
+                child: _MetricTile(label: 'BMI', value: '22.4'),
+              ),
               SizedBox(width: AppSpacing.md),
-              Expanded(child: _MetricTile(label: 'Resting HR', value: '68')),
+              Expanded(
+                child: _MetricTile(label: 'Resting HR', value: '68'),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           const Row(
             children: <Widget>[
-              Expanded(child: _MetricTile(label: 'BP', value: '118/76')),
+              Expanded(
+                child: _MetricTile(label: 'BP', value: '118/76'),
+              ),
               SizedBox(width: AppSpacing.md),
-              Expanded(child: _MetricTile(label: 'Glucose', value: '92')),
+              Expanded(
+                child: _MetricTile(label: 'Glucose', value: '92'),
+              ),
             ],
           ),
         ],
@@ -288,7 +290,6 @@ class _Chip extends StatelessWidget {
 class _TrendLinePainter extends CustomPainter {
   const _TrendLinePainter({required this.points});
 
-  /// Normalised 0 to 1 values, drawn left to right.
   final List<double> points;
 
   @override
@@ -331,7 +332,6 @@ class _TrendLinePainter extends CustomPainter {
         ..strokeJoin = StrokeJoin.round,
     );
 
-    // Emphasise the most recent reading.
     final Offset last = Offset(
       size.width,
       size.height - (points.last * size.height),

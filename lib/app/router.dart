@@ -5,10 +5,6 @@ import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
 import 'routes.dart';
 
-/// Central route table.
-///
-/// Screens are added here as each feature lands so navigation stays declarative
-/// and every destination is reachable by path.
 final GoRouter appRouter = GoRouter(
   initialLocation: Routes.splash,
   routes: <RouteBase>[

@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 
 import '../storage/token_store.dart';
 
-/// Attaches the bearer token to every outgoing request and clears it when the
-/// backend rejects it.
 class AuthInterceptor extends Interceptor {
   AuthInterceptor(this._tokenStore);
 

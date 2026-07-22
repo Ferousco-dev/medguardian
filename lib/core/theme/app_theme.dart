@@ -5,10 +5,6 @@ import 'app_colors.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
 
-/// Builds the single light theme used by the app.
-///
-/// Dark mode is intentionally not wired up yet. When it is, add a matching
-/// [darkTheme] here rather than branching on brightness inside widgets.
 abstract final class AppTheme {
   static ThemeData get light {
     final TextTheme textTheme = AppTypography.textTheme;
@@ -91,7 +87,9 @@ abstract final class AppTheme {
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.lg,
         ),
-        hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.textTertiary),
+        hintStyle: textTheme.bodyMedium?.copyWith(
+          color: AppColors.textTertiary,
+        ),
         labelStyle: textTheme.bodyMedium,
         border: _inputBorder(AppColors.border),
         enabledBorder: _inputBorder(AppColors.border),

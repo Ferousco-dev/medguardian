@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 
-/// Horizontal dots marking progress through the onboarding pages.
 class PageIndicator extends StatelessWidget {
   const PageIndicator({
     super.key,

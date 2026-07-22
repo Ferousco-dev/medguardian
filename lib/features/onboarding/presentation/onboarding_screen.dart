@@ -6,10 +6,6 @@ import '../domain/onboarding_page_data.dart';
 import 'widgets/onboarding_visuals.dart';
 import 'widgets/page_indicator.dart';
 
-/// Three page introduction shown before sign in.
-///
-/// The pages follow the product story: the twin holds your health, trends warn
-/// you early, and the record is yours to share.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -58,9 +54,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _finish() {
-    // Wired to the sign in route once authentication lands.
-  }
+  void _finish() {}
 
   @override
   void dispose() {
@@ -109,9 +103,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         const SizedBox(height: AppSpacing.huge),
                         Text(page.title, style: text.headlineMedium),
                         const SizedBox(height: AppSpacing.md),
-                        Text(page.body, style: text.bodyLarge?.copyWith(
-                          color: AppColors.textSecondary,
-                        )),
+                        Text(
+                          page.body,
+                          style: text.bodyLarge?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
                         const Spacer(),
                       ],
                     ),

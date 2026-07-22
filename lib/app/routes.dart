@@ -1,5 +1,3 @@
-/// Route paths and names, kept in one place so navigation calls never rely on
-/// hand written strings.
 abstract final class Routes {
   static const String splash = '/';
   static const String onboarding = '/onboarding';

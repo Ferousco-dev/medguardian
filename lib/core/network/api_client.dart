@@ -5,12 +5,8 @@ import '../storage/token_store.dart';
 import 'api_exception.dart';
 import 'auth_interceptor.dart';
 
-/// Thin wrapper over Dio.
-///
-/// Repositories call these methods and only ever have to catch [ApiException].
 class ApiClient {
-  ApiClient({required TokenStore tokenStore, Dio? dio})
-      : _dio = dio ?? Dio() {
+  ApiClient({required TokenStore tokenStore, Dio? dio}) : _dio = dio ?? Dio() {
     _dio.options = BaseOptions(
       baseUrl: AppConfig.apiBaseUrl,
       connectTimeout: AppConfig.connectTimeout,
@@ -23,18 +19,11 @@ class ApiClient {
 
   final Dio _dio;
 
-  Future<T> get<T>(
-    String path, {
-    Map<String, dynamic>? query,
-  }) {
+  Future<T> get<T>(String path, {Map<String, dynamic>? query}) {
     return _send<T>(() => _dio.get<T>(path, queryParameters: query));
   }
 
-  Future<T> post<T>(
-    String path, {
-    Object? body,
-    Map<String, dynamic>? query,
-  }) {
+  Future<T> post<T>(String path, {Object? body, Map<String, dynamic>? query}) {
     return _send<T>(
       () => _dio.post<T>(path, data: body, queryParameters: query),
     );

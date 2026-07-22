@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 
-/// The MedGuardian logo mark: a shield with a heartbeat trace across it.
-///
-/// Drawn in code rather than shipped as an asset so it stays crisp at every
-/// size and picks up the theme colours directly.
 class BrandMark extends StatelessWidget {
   const BrandMark({
     super.key,
@@ -19,7 +15,6 @@ class BrandMark extends StatelessWidget {
   final Color color;
   final Color traceColor;
 
-  /// When false the shield is drawn as an outline instead of a solid fill.
   final bool filled;
 
   @override
@@ -70,7 +65,6 @@ class _BrandMarkPainter extends CustomPainter {
 
     canvas.drawPath(shield, shieldPaint);
 
-    // Heartbeat trace, sized relative to the shield so it scales cleanly.
     final Path trace = Path()
       ..moveTo(w * 0.24, h * 0.5)
       ..lineTo(w * 0.38, h * 0.5)

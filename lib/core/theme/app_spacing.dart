@@ -1,7 +1,3 @@
-/// Spacing and radius scale.
-///
-/// Every gap, padding and corner radius in the app comes from these constants
-/// so the layout rhythm stays consistent across screens.
 abstract final class AppSpacing {
   static const double xs = 4;
   static const double sm = 8;
@@ -12,7 +8,6 @@ abstract final class AppSpacing {
   static const double xxxl = 32;
   static const double huge = 48;
 
-  /// Standard horizontal page padding.
   static const double page = 20;
 
   const AppSpacing._();

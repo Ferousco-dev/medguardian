@@ -3,10 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
-/// Type scale for MedGuardian.
-///
-/// Inter is used throughout. Health data is dense and numeric, so the scale
-/// favours tight line heights and clear weight steps over decorative sizes.
 abstract final class AppTypography {
   static TextTheme get textTheme {
     final TextTheme base = GoogleFonts.interTextTheme();
@@ -92,7 +88,6 @@ abstract final class AppTypography {
     );
   }
 
-  /// Tabular figures, for numbers that sit in columns or update in place.
   static TextStyle numeric({
     required double fontSize,
     FontWeight fontWeight = FontWeight.w700,

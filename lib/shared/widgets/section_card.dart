@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 
-/// A flat white panel with a hairline border.
-///
-/// This is the base container for almost every grouped block in the app. It
-/// deliberately has no elevation or gradient, only a border.
 class SectionCard extends StatelessWidget {
   const SectionCard({
     super.key,
@@ -46,11 +42,7 @@ class SectionCard extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: borderRadius,
-        child: content,
-      ),
+      child: InkWell(onTap: onTap, borderRadius: borderRadius, child: content),
     );
   }
 }

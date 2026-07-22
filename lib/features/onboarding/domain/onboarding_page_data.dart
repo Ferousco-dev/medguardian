@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-/// Content for a single onboarding page.
 @immutable
 class OnboardingPageData {
   const OnboardingPageData({
@@ -12,6 +11,5 @@ class OnboardingPageData {
   final String title;
   final String body;
 
-  /// The illustration shown above the copy.
   final Widget visual;
 }
