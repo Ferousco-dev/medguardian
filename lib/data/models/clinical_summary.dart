@@ -62,12 +62,16 @@ class AccessGrant {
     required this.code,
     required this.expiresAt,
     this.grantedTo,
+    this.scope = const <String>[],
   });
 
   final String id;
   final String code;
   final DateTime expiresAt;
   final String? grantedTo;
+
+  /// Ontomorph grant scopes, for example `events:read`.
+  final List<String> scope;
 
   bool get isExpired => DateTime.now().isAfter(expiresAt);
 
@@ -79,6 +83,9 @@ class AccessGrant {
       code: json['code'] as String? ?? '',
       expiresAt: DateTime.parse(json['expires_at'] as String),
       grantedTo: json['granted_to'] as String?,
+      scope: ((json['scope'] as List<dynamic>?) ?? const <dynamic>[])
+          .map((dynamic e) => e.toString())
+          .toList(growable: false),
     );
   }
 }

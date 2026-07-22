@@ -8,6 +8,7 @@ class HealthEvent {
     this.severity = EventSeverity.none,
     this.isHidden = false,
     this.clinicalCode,
+    this.bodySystem,
     this.metadata = const <String, dynamic>{},
   });
 
@@ -22,6 +23,10 @@ class HealthEvent {
 
   final String? clinicalCode;
 
+  /// The Ontomorph body system this event is pinned to, for example
+  /// `cardiovascular`.
+  final String? bodySystem;
+
   final Map<String, dynamic> metadata;
 
   factory HealthEvent.fromJson(Map<String, dynamic> json) {
@@ -34,6 +39,7 @@ class HealthEvent {
       severity: EventSeverity.fromApi(json['severity'] as String?),
       isHidden: json['is_hidden'] as bool? ?? false,
       clinicalCode: json['clinical_code'] as String?,
+      bodySystem: json['body_system'] as String?,
       metadata:
           (json['metadata'] as Map<String, dynamic>?) ??
           const <String, dynamic>{},
@@ -49,6 +55,7 @@ class HealthEvent {
     'severity': severity.apiValue,
     'is_hidden': isHidden,
     'clinical_code': clinicalCode,
+    'body_system': bodySystem,
     'metadata': metadata,
   };
 
@@ -62,6 +69,7 @@ class HealthEvent {
       severity: severity,
       isHidden: isHidden ?? this.isHidden,
       clinicalCode: clinicalCode,
+      bodySystem: bodySystem,
       metadata: metadata,
     );
   }

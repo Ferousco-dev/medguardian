@@ -5,7 +5,7 @@ void main() {
   DigitalTwin twinBornOn(DateTime dateOfBirth) {
     return DigitalTwin(
       id: 'twin_1',
-      did: 'did:onto:8f2a4c19',
+      did: 'did:dtp:8f2a4c19',
       fullName: 'Ada Okoro',
       dateOfBirth: dateOfBirth,
       sex: BiologicalSex.female,
@@ -55,7 +55,7 @@ void main() {
   test('age and bmi are null on a twin with no details yet', () {
     const DigitalTwin bare = DigitalTwin(
       id: 'twin_2',
-      did: 'did:onto:aaaa1111',
+      did: 'did:dtp:aaaa1111',
       fullName: 'New User',
     );
 
@@ -65,7 +65,7 @@ void main() {
   });
 
   test('shortDid truncates the identifier tail', () {
-    expect(twinBornOn(DateTime(1995, 4, 2)).shortDid, 'did:onto:8f2a');
+    expect(twinBornOn(DateTime(1995, 4, 2)).shortDid, 'did:dtp:8f2a');
   });
 
   test('round trips through json', () {

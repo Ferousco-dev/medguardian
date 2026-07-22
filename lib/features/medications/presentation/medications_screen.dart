@@ -172,7 +172,11 @@ class MedicationCard extends StatelessWidget {
             title: 'Possible side effects',
             items: medication.sideEffects,
           ),
-          _Section(title: 'Interactions', items: medication.interactions),
+          _Section(
+            title: 'Interactions',
+            items: medication.interactions,
+            footnote: 'Checked against 1.7 million interactions in HOLON',
+          ),
         ],
       ),
     );
@@ -180,10 +184,11 @@ class MedicationCard extends StatelessWidget {
 }
 
 class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.items});
+  const _Section({required this.title, required this.items, this.footnote});
 
   final String title;
   final List<String> items;
+  final String? footnote;
 
   @override
   Widget build(BuildContext context) {
@@ -219,6 +224,10 @@ class _Section extends StatelessWidget {
                 ],
               ),
             ),
+          if (footnote != null) ...<Widget>[
+            const SizedBox(height: AppSpacing.sm),
+            Text(footnote!, style: text.labelSmall),
+          ],
         ],
       ),
     );

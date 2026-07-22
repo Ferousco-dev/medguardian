@@ -101,7 +101,21 @@ class BiomarkerCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Expanded(child: Text(biomarker.name, style: text.titleMedium)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(biomarker.name, style: text.titleMedium),
+                    if (biomarker.loincCode.isNotEmpty) ...<Widget>[
+                      const SizedBox(height: 2),
+                      Text(
+                        'LOINC ${biomarker.loincCode}',
+                        style: text.labelSmall,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
               StatusPill(
                 label: biomarker.isOutOfRange
                     ? 'Out of range'
@@ -144,7 +158,8 @@ class BiomarkerCard extends StatelessWidget {
             Text(
               'Reference range '
               '${_format(biomarker.referenceLow)} to '
-              '${_format(biomarker.referenceHigh)} ${biomarker.unit}',
+              '${_format(biomarker.referenceHigh)} ${biomarker.unit}, '
+              'from HOLON for your age and sex',
               style: text.bodySmall,
             ),
           ],

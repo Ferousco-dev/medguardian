@@ -117,6 +117,7 @@ class MockCareRepository implements CareRepository {
       id: 'grant_demo',
       code: 'MG-4K9T-2XPQ',
       expiresAt: DateTime.now().add(duration),
+      scope: const <String>['events:read', 'biomarkers:read', 'summary:read'],
     );
   }
 

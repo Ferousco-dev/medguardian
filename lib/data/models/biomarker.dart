@@ -1,5 +1,6 @@
 class Biomarker {
   const Biomarker({
+    required this.loincCode,
     required this.code,
     required this.name,
     required this.unit,
@@ -8,6 +9,11 @@ class Biomarker {
     this.referenceHigh,
     this.trend = BiomarkerTrend.stable,
   });
+
+  /// LOINC code. This is how Ontomorph keys biomarker trends, so it is the
+  /// identifier used against the platform. [code] stays as a readable slug for
+  /// local grouping only.
+  final String loincCode;
 
   final String code;
 
@@ -52,6 +58,7 @@ class Biomarker {
     final List<dynamic> raw =
         (json['readings'] as List<dynamic>?) ?? const <dynamic>[];
     return Biomarker(
+      loincCode: json['loinc_code'] as String? ?? '',
       code: json['code'] as String,
       name: json['name'] as String? ?? '',
       unit: json['unit'] as String? ?? '',
@@ -67,6 +74,7 @@ class Biomarker {
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
+    'loinc_code': loincCode,
     'code': code,
     'name': name,
     'unit': unit,

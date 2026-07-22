@@ -5,7 +5,7 @@ import 'package:medguardian/features/twin/domain/twin_completion.dart';
 void main() {
   const DigitalTwin bare = DigitalTwin(
     id: 'twin_1',
-    did: 'did:onto:aaaa',
+    did: 'did:dtp:aaaa',
     fullName: 'Ada Okoro',
   );
 

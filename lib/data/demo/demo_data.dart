@@ -25,7 +25,7 @@ abstract final class DemoData {
 
   static DigitalTwin get twin => DigitalTwin(
     id: 'twin_demo',
-    did: 'did:onto:8f2a4c19',
+    did: 'did:dtp:8f2a4c19',
     fullName: 'Ada Okoro',
     dateOfBirth: DateTime(1994, 3, 17),
     sex: BiologicalSex.female,
@@ -45,6 +45,7 @@ abstract final class DemoData {
   static List<HealthEvent> get events => <HealthEvent>[
     HealthEvent(
       id: 'evt_1',
+      bodySystem: 'cardiovascular',
       type: HealthEventType.measurement,
       title: 'Blood pressure 138/89',
       description: 'Home reading, taken after breakfast.',
@@ -54,6 +55,7 @@ abstract final class DemoData {
     ),
     HealthEvent(
       id: 'evt_2',
+      bodySystem: 'nervous',
       type: HealthEventType.symptom,
       title: 'Headache',
       description: 'Dull, behind the eyes, third time this month.',
@@ -62,6 +64,7 @@ abstract final class DemoData {
     ),
     HealthEvent(
       id: 'evt_3',
+      bodySystem: 'endocrine',
       type: HealthEventType.labResult,
       title: 'HbA1c 5.9 percent',
       description: 'Routine panel at Lagoon Diagnostics.',
@@ -71,6 +74,7 @@ abstract final class DemoData {
     ),
     HealthEvent(
       id: 'evt_4',
+      bodySystem: 'cardiovascular',
       type: HealthEventType.medication,
       title: 'Started Lisinopril 5mg',
       description: 'Once daily, prescribed by Dr Bello.',
@@ -78,6 +82,7 @@ abstract final class DemoData {
     ),
     HealthEvent(
       id: 'evt_5',
+      bodySystem: 'general',
       type: HealthEventType.visit,
       title: 'General practice review',
       description: 'Discussed blood pressure trend and diet.',
@@ -85,6 +90,7 @@ abstract final class DemoData {
     ),
     HealthEvent(
       id: 'evt_6',
+      bodySystem: 'endocrine',
       type: HealthEventType.diagnosis,
       title: 'Prediabetes',
       description: 'Based on fasting glucose and HbA1c.',
@@ -94,6 +100,7 @@ abstract final class DemoData {
     ),
     HealthEvent(
       id: 'evt_7',
+      bodySystem: 'immune',
       type: HealthEventType.vaccination,
       title: 'Tetanus booster',
       occurredAt: _daysAgo(140),
@@ -110,6 +117,7 @@ abstract final class DemoData {
 
   static List<Biomarker> get biomarkers => <Biomarker>[
     Biomarker(
+      loincCode: '8480-6',
       code: 'blood_pressure_systolic',
       name: 'Systolic blood pressure',
       unit: 'mmHg',
@@ -126,6 +134,7 @@ abstract final class DemoData {
       ], spacingDays: 30),
     ),
     Biomarker(
+      loincCode: '1558-6',
       code: 'blood_glucose',
       name: 'Fasting glucose',
       unit: 'mg/dL',
@@ -135,6 +144,7 @@ abstract final class DemoData {
       readings: _series(<double>[92, 95, 98, 101, 104, 108], spacingDays: 30),
     ),
     Biomarker(
+      loincCode: '4548-4',
       code: 'hba1c',
       name: 'HbA1c',
       unit: '%',
@@ -144,6 +154,7 @@ abstract final class DemoData {
       readings: _series(<double>[5.3, 5.5, 5.7, 5.9], spacingDays: 60),
     ),
     Biomarker(
+      loincCode: '39156-5',
       code: 'bmi',
       name: 'Body mass index',
       unit: 'kg/m2',
@@ -160,6 +171,7 @@ abstract final class DemoData {
       ], spacingDays: 30),
     ),
     Biomarker(
+      loincCode: '8867-4',
       code: 'resting_heart_rate',
       name: 'Resting heart rate',
       unit: 'bpm',
@@ -169,6 +181,17 @@ abstract final class DemoData {
       readings: _series(<double>[72, 70, 71, 69, 70, 71], spacingDays: 30),
     ),
     Biomarker(
+      loincCode: '2708-6',
+      code: 'oxygen_saturation',
+      name: 'Oxygen saturation',
+      unit: '%',
+      referenceHigh: 100,
+      referenceLow: 95,
+      trend: BiomarkerTrend.stable,
+      readings: _series(<double>[98, 97, 98, 98, 97, 98], spacingDays: 30),
+    ),
+    Biomarker(
+      loincCode: '2093-3',
       code: 'total_cholesterol',
       name: 'Total cholesterol',
       unit: 'mg/dL',

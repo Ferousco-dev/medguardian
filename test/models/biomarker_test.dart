@@ -4,6 +4,7 @@ import 'package:medguardian/data/models/biomarker.dart';
 void main() {
   Biomarker glucose(List<double> values) {
     return Biomarker(
+      loincCode: '1558-6',
       code: 'blood_glucose',
       name: 'Blood glucose',
       unit: 'mg/dL',
@@ -54,6 +55,7 @@ void main() {
     );
 
     expect(decoded.code, 'blood_glucose');
+    expect(decoded.loincCode, '1558-6');
     expect(decoded.readings, hasLength(2));
     expect(decoded.readings.last.value, 94);
   });

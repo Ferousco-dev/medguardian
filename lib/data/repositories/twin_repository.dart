@@ -200,6 +200,7 @@ class MockTwinRepository implements TwinRepository {
 
     final Biomarker existing = _currentBiomarkers[index];
     final Biomarker updated = Biomarker(
+      loincCode: existing.loincCode,
       code: existing.code,
       name: existing.name,
       unit: existing.unit,

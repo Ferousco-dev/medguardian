@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../data/models/clinical_summary.dart';
 import '../../../../shared/widgets/async_view.dart';
+import '../../../../shared/widgets/status_pill.dart';
 import '../../application/summary_controller.dart';
 
 class ShareAccessSheet extends ConsumerStatefulWidget {
@@ -160,6 +161,23 @@ class _GrantCard extends StatelessWidget {
             'Expires ${DateFormat('d MMM, HH:mm').format(grant.expiresAt)}',
             style: text.bodySmall,
           ),
+          if (grant.scope.isNotEmpty) ...<Widget>[
+            const SizedBox(height: AppSpacing.md),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: grant.scope
+                  .map((String s) => StatusPill(label: s))
+                  .toList(growable: false),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Scoped and revocable. You can end this at any time.',
+              style: text.labelSmall,
+              textAlign: TextAlign.center,
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
           OutlinedButton.icon(
             onPressed: () async {
