@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/health_event.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import 'widgets/timeline_entry.dart';
 
 class TimelineScreen extends ConsumerStatefulWidget {
@@ -105,10 +106,13 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                       ),
                       itemCount: visible.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return TimelineEntry(
-                          event: visible[index],
-                          isFirst: index == 0,
-                          isLast: index == visible.length - 1,
+                        return EntranceFade(
+                          index: index,
+                          child: TimelineEntry(
+                            event: visible[index],
+                            isFirst: index == 0,
+                            isLast: index == visible.length - 1,
+                          ),
                         );
                       },
                     ),

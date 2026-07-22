@@ -50,7 +50,12 @@ class TimelineEntry extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _Rail(isFirst: isFirst, isLast: isLast, tone: _tone),
+          _Rail(
+            isFirst: isFirst,
+            isLast: isLast,
+            tone: _tone,
+            icon: _icons[event.type] ?? Icons.circle_outlined,
+          ),
           const SizedBox(width: AppSpacing.lg),
           Expanded(
             child: Padding(
@@ -66,16 +71,10 @@ class TimelineEntry extends StatelessWidget {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Icon(
-                          _icons[event.type] ?? Icons.circle_outlined,
-                          size: 15,
-                          color: AppColors.textTertiary,
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
                         Text(event.type.label, style: text.labelSmall),
                         const Spacer(),
                         Text(
-                          DateFormat('d MMM yyyy').format(event.occurredAt),
+                          DateFormat('d MMM').format(event.occurredAt),
                           style: text.bodySmall,
                         ),
                       ],
@@ -125,38 +124,39 @@ class _Rail extends StatelessWidget {
     required this.isFirst,
     required this.isLast,
     required this.tone,
+    required this.icon,
   });
 
   final bool isFirst;
   final bool isLast;
   final StatusTone tone;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
+    final bool isNeutral = tone == StatusTone.neutral;
+
     return SizedBox(
-      width: 16,
+      width: 32,
       child: Column(
         children: <Widget>[
           SizedBox(
-            height: isFirst ? 4 : 10,
+            height: isFirst ? 2 : 8,
             child: isFirst
                 ? null
                 : const VerticalDivider(width: 1, thickness: 1),
           ),
           Container(
-            height: 12,
-            width: 12,
+            height: 32,
+            width: 32,
             decoration: BoxDecoration(
-              color: tone == StatusTone.neutral
-                  ? AppColors.surface
-                  : tone.background,
+              color: isNeutral ? AppColors.surfaceMuted : tone.background,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: tone == StatusTone.neutral
-                    ? AppColors.borderStrong
-                    : tone.foreground,
-                width: 2,
-              ),
+            ),
+            child: Icon(
+              icon,
+              size: 16,
+              color: isNeutral ? AppColors.textSecondary : tone.foreground,
             ),
           ),
           if (!isLast)
