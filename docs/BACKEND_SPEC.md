@@ -292,7 +292,53 @@ Response `200`:
 
 ---
 
-## 6. Biomarkers
+## 6. Health assistant chat
+
+> Ontomorph: **Twin**, **Events**, **Biomarker Trends**, **Insights**, plus your LLM.
+
+### `POST /chat`
+
+Conversational questions about the user's own record. This is the screen where the twin has to visibly pay off, so the reply must cite the record.
+
+Request:
+```json
+{
+  "message": "Why is my health score 68?",
+  "history": [
+    { "id": "chat_1", "role": "assistant", "text": "...", "sent_at": "2026-07-22T09:00:00Z" },
+    { "id": "user_2", "role": "user", "text": "...", "sent_at": "2026-07-22T09:01:00Z" }
+  ]
+}
+```
+
+`history` is the full conversation so far, oldest first, so the endpoint can stay stateless.
+
+Response `200`:
+```json
+{
+  "id": "chat_01H99",
+  "role": "assistant",
+  "text": "Your score is 68, down from 76 last month. Three things pull it down...",
+  "sent_at": "2026-07-22T09:01:30Z",
+  "grounded_on": ["Risk score", "Blood pressure", "Fasting glucose"],
+  "suggestions": ["How do I bring my blood pressure down?"],
+  "is_emergency": false
+}
+```
+
+`grounded_on` is the list of record sections the answer actually used. The client renders these as chips under the reply, labelled "Read from your twin". Send short human labels, not internal ids. Leave it empty rather than inventing entries, a wrong citation is worse than none.
+
+`suggestions` are follow-up prompts offered as tappable chips. Two or three is plenty. Two strings are handled specially by the client and route instead of sending a message: anything containing `Report a symptom` opens symptom analysis, anything containing `clinical summary` opens the summary screen.
+
+`is_emergency` set to `true` makes the client render the reply in the danger style and show an "Open emergency card" button. Set it for chest pain, breathing difficulty, stroke signs, severe bleeding or loss of consciousness, and keep the reply short and directive when you do.
+
+**Grounding is the whole point.** Load the twin, recent events and biomarker trends into the prompt. A reply that could have been written without the record makes the entire product look like a wrapper.
+
+**Never diagnose.** Explain, contextualise against the record, and route to a clinician.
+
+---
+
+## 7. Biomarkers
 
 > Ontomorph: **Biomarker Trends** and **Metrics**.
 
@@ -345,7 +391,7 @@ Optional. Reserved for a per-biomarker detail view. Not called by the current cl
 
 ---
 
-## 7. Risk, insights and simulation
+## 8. Risk, insights and simulation
 
 > Ontomorph: **Insights**, **Alert Rules**, **Analytics**, **Simulations**.
 
@@ -443,7 +489,7 @@ Response `200`:
 
 ---
 
-## 8. Medications
+## 9. Medications
 
 > Ontomorph: **Events** of type `medication`, plus a drug reference source.
 
@@ -478,7 +524,7 @@ Returns a single medication object for a name search. Response `200`.
 
 ---
 
-## 9. Clinical summary, FHIR and sharing
+## 10. Clinical summary, FHIR and sharing
 
 > Ontomorph: **Provider APIs**, **Clinical Summary**, **FHIR Export**, **Temporary Access**.
 
@@ -550,7 +596,7 @@ Response `201`:
 
 ---
 
-## 10. Health library
+## 11. Health library
 
 ### `GET /guides`
 
@@ -580,11 +626,11 @@ Optional. The client currently ships this content locally, so the library works 
 
 ---
 
-## 11. Hospitals
+## 12. Hospitals
 
 ### `GET /hospitals/nearby?lat=6.45&lng=3.42`
 
-The client currently calls this without coordinates. Accept optional `lat` and `lng` query parameters and fall back to a sensible default region when they are absent.
+Accept optional `lat` and `lng` query parameters and fall back to a sensible default region when they are absent. The client asks for location permission and degrades gracefully when the user declines, so **absent coordinates are a normal case, not an error**. Never return a 4xx for a missing `lat` or `lng`.
 
 Response `200`:
 ```json
@@ -608,7 +654,7 @@ Sort nearest first. `image_url` must be a plain HTTPS image URL, the client appe
 
 ---
 
-## 12. Build order
+## 13. Build order
 
 If time is short, build in this order. The client degrades gracefully and shows an error state per section, so partial delivery still demos.
 
@@ -617,7 +663,7 @@ If time is short, build in this order. The client degrades gracefully and shows 
 3. `GET /events`, `POST /events`
 4. `GET /biomarkers`, `POST /biomarkers`
 5. `GET /risk-score`, `GET /insights`
-6. `POST /symptoms/analyse`
+6. `POST /symptoms/analyse`, then `POST /chat`
 7. `POST /clinical-summary`, `GET /fhir/export`
 8. `POST /simulations`
 9. `GET /medications`, `GET /hospitals/nearby`, `POST /access-grants`
@@ -626,7 +672,7 @@ Steps 1 to 6 cover the core demo. Everything after that is upside.
 
 ---
 
-## 13. Checklist before handing back the URL
+## 14. Checklist before handing back the URL
 
 - [ ] HTTPS, with a valid certificate. Android blocks plain HTTP by default.
 - [ ] CORS is irrelevant for the mobile client, ignore it unless a web build is added.
@@ -640,6 +686,8 @@ Steps 1 to 6 cover the core demo. Everything after that is upside.
 - [ ] Biomarker `readings` are sorted oldest first.
 - [ ] Hidden events are absent from `POST /clinical-summary` and `GET /fhir/export`.
 - [ ] `POST /symptoms/analyse` returns `emergency` for chest pain and breathing difficulty.
+- [ ] `POST /chat` sets `is_emergency` for the same patterns.
+- [ ] `POST /chat` replies quote real values from the record, not generic advice.
 - [ ] At least one seeded demo account exists with roughly six months of history, so the trends and projections have something to show.
 
 Send back the base URL and the demo account credentials. That is all the client needs.
