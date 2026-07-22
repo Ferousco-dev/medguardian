@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -88,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   itemCount: _pages.length,
                   onPageChanged: (int index) => setState(() => _index = index),
                   itemBuilder: (BuildContext context, int index) =>
-                      _OnboardingImage(url: _pages[index].imageUrl),
+                      _OnboardingImage(asset: _pages[index].imageUrl),
                 ),
                 Positioned(
                   top: MediaQuery.paddingOf(context).top + AppSpacing.sm,
@@ -171,18 +170,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class _OnboardingImage extends StatelessWidget {
-  const _OnboardingImage({required this.url});
+  const _OnboardingImage({required this.asset});
 
-  final String url;
+  final String asset;
 
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      imageUrl: AppImages.sized(url, width: 1200, quality: 75),
+    return Image.asset(
+      asset,
       fit: BoxFit.cover,
-      fadeInDuration: const Duration(milliseconds: 250),
-      placeholder: (_, _) => const ColoredBox(color: AppColors.surfaceMuted),
-      errorWidget: (_, _, _) => const ColoredBox(
+      errorBuilder: (_, _, _) => const ColoredBox(
         color: AppColors.primaryTint,
         child: Center(
           child: Icon(Icons.image_outlined, color: AppColors.primary, size: 28),

@@ -14,12 +14,9 @@ abstract final class AppImages {
     'https://images.unsplash.com/photo-1582750433449-648ed127bb54',
   ];
 
-  static const String onboardingRecord =
-      'https://images.unsplash.com/photo-1573496782432-8690d8148c46';
-  static const String onboardingTrends =
-      'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0';
-  static const String onboardingShare =
-      'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133';
+  static const String onboardingRecord = 'assets/images/onboarding_record.jpg';
+  static const String onboardingTrends = 'assets/images/onboarding_trends.jpg';
+  static const String onboardingShare = 'assets/images/onboarding_share.jpg';
 
   static const String bloodPressureMonitor =
       'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0';

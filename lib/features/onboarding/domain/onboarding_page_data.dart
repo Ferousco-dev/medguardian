@@ -8,6 +8,7 @@ class OnboardingPageData {
     required this.body,
   });
 
+  /// Bundled asset path.
   final String imageUrl;
   final String title;
   final String body;
