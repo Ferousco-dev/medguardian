@@ -181,7 +181,15 @@ class _Tile extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Row(
           children: <Widget>[
-            Icon(icon, size: 20, color: AppColors.textSecondary),
+            Container(
+              height: 34,
+              width: 34,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMuted,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+              ),
+              child: Icon(icon, size: 17, color: AppColors.textSecondary),
+            ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(label, style: Theme.of(context).textTheme.bodyLarge),

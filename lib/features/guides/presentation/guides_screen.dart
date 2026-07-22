@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/demo/demo_guides.dart';
 import '../../../data/models/health_guide.dart';
+import '../../../shared/widgets/entrance.dart';
 import 'widgets/guide_card.dart';
 
 class GuidesScreen extends StatelessWidget {
@@ -31,49 +32,52 @@ class GuidesScreen extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             final HealthGuide guide = DemoGuides.all[index];
 
-            return Material(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              child: InkWell(
-                onTap: () => context.push('${Routes.guides}/${guide.id}'),
+            return EntranceFade(
+              index: index,
+              child: Material(
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppRadius.lg),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      GuideImage(url: guide.imageUrl, height: 150),
-                      Padding(
-                        padding: const EdgeInsets.all(AppSpacing.xl),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(guide.title, style: text.titleMedium),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(guide.summary, style: text.bodyMedium),
-                            const SizedBox(height: AppSpacing.md),
-                            Row(
-                              children: <Widget>[
-                                const Icon(
-                                  Icons.schedule_rounded,
-                                  size: 13,
-                                  color: AppColors.textTertiary,
-                                ),
-                                const SizedBox(width: AppSpacing.xs),
-                                Text(
-                                  '${guide.readMinutes} min read',
-                                  style: text.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ],
+                child: InkWell(
+                  onTap: () => context.push('${Routes.guides}/${guide.id}'),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        GuideImage(url: guide.imageUrl, height: 150),
+                        Padding(
+                          padding: const EdgeInsets.all(AppSpacing.xl),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(guide.title, style: text.titleMedium),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(guide.summary, style: text.bodyMedium),
+                              const SizedBox(height: AppSpacing.md),
+                              Row(
+                                children: <Widget>[
+                                  const Icon(
+                                    Icons.schedule_rounded,
+                                    size: 13,
+                                    color: AppColors.textTertiary,
+                                  ),
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Text(
+                                    '${guide.readMinutes} min read',
+                                    style: text.bodySmall,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
