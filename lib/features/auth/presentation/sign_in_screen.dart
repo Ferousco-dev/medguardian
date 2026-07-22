@@ -6,6 +6,7 @@ import '../../../app/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_text_field.dart';
+import '../../../shared/widgets/async_view.dart';
 import '../application/auth_controller.dart';
 import '../domain/validators.dart';
 import 'widgets/auth_header.dart';
@@ -56,13 +57,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
     ref.listen(authControllerProvider, (_, AsyncValue<Object?> next) {
       if (next.hasError && !next.isLoading) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text('Could not sign you in. Check your details.'),
-            ),
-          );
+        AppSnack.error(context, next.error!);
       }
     });
 

@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Source design assets kept out of the repo
+*.psd
+ChatGPT Image*.png

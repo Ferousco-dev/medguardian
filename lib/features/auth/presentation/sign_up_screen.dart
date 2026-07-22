@@ -8,6 +8,7 @@ import '../../../data/models/digital_twin.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_text_field.dart';
+import '../../../shared/widgets/async_view.dart';
 import '../application/auth_controller.dart';
 import '../domain/validators.dart';
 import 'widgets/auth_header.dart';
@@ -42,11 +43,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
 
     if (!_acceptedTerms) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('Accept the terms to continue.')),
-        );
+      AppSnack.show(
+        context,
+        'Please accept the terms before creating your account.',
+        isError: true,
+      );
       return;
     }
 
@@ -80,6 +81,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
     final bool isBusy = ref.watch(authControllerProvider).isLoading;
+
+    ref.listen(authControllerProvider, (_, AsyncValue<Object?> next) {
+      if (next.hasError && !next.isLoading) {
+        AppSnack.error(context, next.error!);
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(leading: const BackButton()),

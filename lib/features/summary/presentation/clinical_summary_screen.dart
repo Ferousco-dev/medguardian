@@ -164,11 +164,7 @@ class _SummaryView extends ConsumerWidget {
     );
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('FHIR bundle copied to clipboard')),
-        );
+      AppSnack.show(context, 'FHIR bundle copied to your clipboard');
     }
   }
 

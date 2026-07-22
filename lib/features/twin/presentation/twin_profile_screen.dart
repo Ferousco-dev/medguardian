@@ -171,11 +171,7 @@ class _IdentityCard extends StatelessWidget {
                 onPressed: () async {
                   await Clipboard.setData(ClipboardData(text: twin.did));
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(
-                        const SnackBar(content: Text('Identifier copied')),
-                      );
+                    AppSnack.show(context, 'Twin identifier copied');
                   }
                 },
                 icon: const Icon(Icons.copy_rounded, size: 18),

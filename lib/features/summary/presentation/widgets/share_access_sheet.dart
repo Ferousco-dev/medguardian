@@ -166,11 +166,7 @@ class _GrantCard extends StatelessWidget {
               await Clipboard.setData(ClipboardData(text: grant.code));
               if (context.mounted) {
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    const SnackBar(content: Text('Access code copied')),
-                  );
+                AppSnack.show(context, 'Access code copied');
               }
             },
             icon: const Icon(Icons.copy_rounded, size: 16),
