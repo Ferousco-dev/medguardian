@@ -13,6 +13,7 @@ abstract final class ApiEndpoints {
   static const String emergencyCard = '/events/emergency-card';
 
   static const String analyseSymptoms = '/symptoms/analyse';
+  static const String chat = '/chat';
 
   static const String biomarkers = '/biomarkers';
   static String biomarkerTrend(String code) => '/biomarkers/$code/trend';

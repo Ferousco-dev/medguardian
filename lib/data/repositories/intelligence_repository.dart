@@ -1,6 +1,8 @@
 import '../../core/network/api_client.dart';
 import '../../core/network/api_endpoints.dart';
 import '../demo/demo_data.dart';
+import '../demo/demo_chat.dart';
+import '../models/chat_message.dart';
 import '../models/health_insight.dart';
 import '../models/health_simulation.dart';
 import '../models/risk_score.dart';
@@ -14,6 +16,11 @@ abstract interface class IntelligenceRepository {
   Future<HealthSimulation> runSimulation(String question);
 
   Future<SymptomAnalysis> analyseSymptoms(String description);
+
+  Future<ChatMessage> sendChatMessage(
+    String message,
+    List<ChatMessage> history,
+  );
 }
 
 class RemoteIntelligenceRepository implements IntelligenceRepository {
@@ -56,6 +63,23 @@ class RemoteIntelligenceRepository implements IntelligenceRepository {
     );
     return SymptomAnalysis.fromJson(json);
   }
+
+  @override
+  Future<ChatMessage> sendChatMessage(
+    String message,
+    List<ChatMessage> history,
+  ) async {
+    final Map<String, dynamic> json = await _client.post<Map<String, dynamic>>(
+      ApiEndpoints.chat,
+      body: <String, dynamic>{
+        'message': message,
+        'history': history
+            .map((ChatMessage m) => m.toJson())
+            .toList(growable: false),
+      },
+    );
+    return ChatMessage.fromJson(json);
+  }
 }
 
 class MockIntelligenceRepository implements IntelligenceRepository {
@@ -85,5 +109,14 @@ class MockIntelligenceRepository implements IntelligenceRepository {
   Future<SymptomAnalysis> analyseSymptoms(String description) async {
     await Future<void>.delayed(const Duration(milliseconds: 1600));
     return DemoData.analysisFor(description);
+  }
+
+  @override
+  Future<ChatMessage> sendChatMessage(
+    String message,
+    List<ChatMessage> history,
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
+    return DemoChat.replyTo(message);
   }
 }

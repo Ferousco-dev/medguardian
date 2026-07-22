@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/biomarkers/presentation/biomarkers_screen.dart';
+import '../features/chat/presentation/health_chat_screen.dart';
 import '../features/emergency/presentation/emergency_screen.dart';
 import '../features/guides/presentation/guide_detail_screen.dart';
 import '../features/guides/presentation/guides_screen.dart';
@@ -50,6 +51,7 @@ final GoRouter appRouter = GoRouter(
     _route(Routes.settings, SettingsScreen.new),
 
     _route(Routes.symptomCheck, SymptomCheckScreen.new),
+    _route(Routes.healthChat, HealthChatScreen.new),
     _route(Routes.simulation, SimulationScreen.new),
     _route(Routes.riskScore, RiskScoreScreen.new),
     _route(Routes.medications, MedicationsScreen.new),

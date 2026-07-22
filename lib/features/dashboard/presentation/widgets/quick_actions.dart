@@ -15,9 +15,9 @@ class QuickActions extends StatelessWidget {
       route: Routes.symptomCheck,
     ),
     _Action(
-      icon: Icons.monitor_heart_outlined,
-      label: 'Log reading',
-      route: Routes.biomarkers,
+      icon: Icons.forum_outlined,
+      label: 'Ask assistant',
+      route: Routes.healthChat,
     ),
     _Action(
       icon: Icons.medication_outlined,
