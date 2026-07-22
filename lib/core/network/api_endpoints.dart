@@ -5,6 +5,7 @@ abstract final class ApiEndpoints {
   static const String me = '/auth/me';
 
   static const String twin = '/twin';
+  static const String seedDemo = '/twin/seed-demo';
   static const String twinProfile = '/twin/profile';
 
   static const String events = '/events';
@@ -30,6 +31,12 @@ abstract final class ApiEndpoints {
   static const String temporaryAccess = '/access-grants';
 
   static const String hospitals = '/hospitals/nearby';
+
+  static const String sources = '/sources';
+  static String connectSource(String id) => '/sources/$id/connect';
+  static String disconnectSource(String id) => '/sources/$id/disconnect';
+  static String syncSource(String id) => '/sources/$id/sync';
+  static const String importFhir = '/imports/fhir';
 
   const ApiEndpoints._();
 }

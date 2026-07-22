@@ -7,7 +7,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../data/models/biomarker.dart';
+import '../../../data/models/data_source.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/section_card.dart';
 import '../../../shared/widgets/status_pill.dart';
 import 'widgets/biomarker_chart.dart';
@@ -54,8 +56,10 @@ class BiomarkersScreen extends ConsumerWidget {
                 itemCount: value.length,
                 separatorBuilder: (_, _) =>
                     const SizedBox(height: AppSpacing.lg),
-                itemBuilder: (BuildContext context, int index) =>
-                    BiomarkerCard(biomarker: value[index]),
+                itemBuilder: (BuildContext context, int index) => EntranceFade(
+                  index: index,
+                  child: BiomarkerCard(biomarker: value[index]),
+                ),
               ),
             );
           },
@@ -144,10 +148,23 @@ class BiomarkerCard extends StatelessWidget {
             ],
           ),
           if (latest != null) ...<Widget>[
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              'Last recorded ${DateFormat('d MMM yyyy').format(latest.recordedAt)}',
-              style: text.bodySmall,
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: <Widget>[
+                Icon(
+                  _sourceIcon(latest.source),
+                  size: 13,
+                  color: AppColors.textTertiary,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Text(
+                    '${_sourceLabel(latest.source)}, '
+                    '${DateFormat('d MMM yyyy').format(latest.recordedAt)}',
+                    style: text.bodySmall,
+                  ),
+                ),
+              ],
             ),
           ],
           const SizedBox(height: AppSpacing.xl),
@@ -174,4 +191,17 @@ class BiomarkerCard extends StatelessWidget {
     }
     return value % 1 == 0 ? value.toStringAsFixed(0) : value.toStringAsFixed(1);
   }
+
+  static DataSourceKind _kind(String? source) =>
+      DataSourceKindLabel.fromApi(source);
+
+  static IconData _sourceIcon(String? source) => switch (_kind(source)) {
+    DataSourceKind.wearable => Icons.watch_outlined,
+    DataSourceKind.clinic => Icons.local_hospital_outlined,
+    DataSourceKind.lab => Icons.science_outlined,
+    DataSourceKind.demo => Icons.dataset_outlined,
+    DataSourceKind.manual => Icons.edit_outlined,
+  };
+
+  static String _sourceLabel(String? source) => _kind(source).label;
 }

@@ -90,6 +90,12 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const Divider(),
                   _Tile(
+                    icon: Icons.cable_rounded,
+                    label: 'Data sources and devices',
+                    onTap: () => context.push(Routes.dataSources),
+                  ),
+                  const Divider(),
+                  _Tile(
                     icon: Icons.menu_book_outlined,
                     label: 'Health library',
                     onTap: () => context.push(Routes.guides),

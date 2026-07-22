@@ -11,8 +11,10 @@ import '../data/models/hospital.dart';
 import '../data/models/medication.dart';
 import '../data/models/risk_score.dart';
 import '../data/repositories/auth_repository.dart';
+import '../data/models/data_source.dart';
 import '../data/repositories/care_repository.dart';
 import '../data/repositories/intelligence_repository.dart';
+import '../data/repositories/sources_repository.dart';
 import '../data/repositories/twin_repository.dart';
 
 final Provider<TokenStore> tokenStoreProvider = Provider<TokenStore>(
@@ -57,6 +59,19 @@ final Provider<CareRepository> careRepositoryProvider =
       }
       return RemoteCareRepository(ref.watch(apiClientProvider));
     });
+
+final Provider<SourcesRepository> sourcesRepositoryProvider =
+    Provider<SourcesRepository>((Ref ref) {
+      if (AppConfig.useMockData) {
+        return MockSourcesRepository();
+      }
+      return RemoteSourcesRepository(ref.watch(apiClientProvider));
+    });
+
+final FutureProvider<List<ConnectedSource>> sourcesProvider =
+    FutureProvider<List<ConnectedSource>>(
+      (Ref ref) => ref.watch(sourcesRepositoryProvider).fetchSources(),
+    );
 
 final FutureProvider<DigitalTwin> twinProvider = FutureProvider<DigitalTwin>(
   (Ref ref) => ref.watch(twinRepositoryProvider).fetchTwin(),

@@ -12,6 +12,7 @@ import '../../../data/models/digital_twin.dart';
 import '../../../data/models/health_insight.dart';
 import '../../../data/models/risk_score.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/metric_tile.dart';
 import '../../../shared/widgets/section_heading.dart';
 import '../../../shared/widgets/section_card.dart';
@@ -76,7 +77,7 @@ class DashboardScreen extends ConsumerWidget {
               AppSpacing.huge,
             ),
             children: <Widget>[
-              _Greeting(twin: twin),
+              EntranceFade(index: 0, child: _Greeting(twin: twin)),
               if (twin.valueOrNull != null) ...<Widget>[
                 Builder(
                   builder: (BuildContext context) {
@@ -94,17 +95,20 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: AppSpacing.xxl),
-              AsyncView<RiskScore>(
-                value: risk,
-                onRetry: () => ref.invalidate(riskScoreProvider),
-                loading: const Skeleton(height: 190),
-                data: (RiskScore value) => RiskScoreCard(
-                  score: value,
-                  onTap: () => context.push(Routes.riskScore),
+              EntranceFade(
+                index: 1,
+                child: AsyncView<RiskScore>(
+                  value: risk,
+                  onRetry: () => ref.invalidate(riskScoreProvider),
+                  loading: const Skeleton(height: 190),
+                  data: (RiskScore value) => RiskScoreCard(
+                    score: value,
+                    onTap: () => context.push(Routes.riskScore),
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.xxl),
-              const QuickActions(),
+              const EntranceFade(index: 2, child: QuickActions()),
               const SizedBox(height: AppSpacing.xxl),
               SectionHeading(
                 title: 'Your vitals',
