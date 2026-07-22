@@ -8,6 +8,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../data/models/chat_message.dart';
 import '../../../shared/widgets/async_view.dart';
 import '../application/chat_controller.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import 'widgets/chat_bubble.dart';
 
 class HealthChatScreen extends ConsumerStatefulWidget {
@@ -71,7 +72,33 @@ class _HealthChatScreenState extends ConsumerState<HealthChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Health assistant'),
+        titleSpacing: 0,
+        title: Row(
+          children: <Widget>[
+            Container(
+              height: 34,
+              width: 34,
+              decoration: BoxDecoration(
+                color: AppColors.primaryTint,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+              ),
+              alignment: Alignment.center,
+              child: const BrandMark(size: 22),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('Health assistant', style: text.titleMedium),
+                Text(
+                  'Reads your twin, not the internet',
+                  style: text.labelSmall,
+                ),
+              ],
+            ),
+          ],
+        ),
         actions: <Widget>[
           IconButton(
             tooltip: 'Start over',
