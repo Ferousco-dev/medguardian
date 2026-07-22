@@ -11,6 +11,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../data/models/digital_twin.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/section_card.dart';
 import '../../../shared/widgets/section_heading.dart';
 import '../../../shared/widgets/status_pill.dart';
@@ -48,11 +49,14 @@ class TwinProfileScreen extends ConsumerWidget {
               AppSpacing.huge,
             ),
             children: <Widget>[
-              _IdentityCard(twin: value),
+              EntranceFade(index: 0, child: _IdentityCard(twin: value)),
               const SizedBox(height: AppSpacing.lg),
-              CompletionCard(
-                completion: TwinCompletion.of(value),
-                onComplete: () => context.push(Routes.healthSetupEdit),
+              EntranceFade(
+                index: 1,
+                child: CompletionCard(
+                  completion: TwinCompletion.of(value),
+                  onComplete: () => context.push(Routes.healthSetupEdit),
+                ),
               ),
               const SizedBox(height: AppSpacing.xxl),
               SectionHeading(
@@ -109,8 +113,20 @@ class _IdentityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
 
-    return SectionCard(
+    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.22),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -119,8 +135,8 @@ class _IdentityCard extends StatelessWidget {
               Container(
                 height: 56,
                 width: 56,
-                decoration: const BoxDecoration(
-                  color: AppColors.primaryTint,
+                decoration: BoxDecoration(
+                  color: AppColors.onPrimary.withValues(alpha: 0.18),
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -128,7 +144,7 @@ class _IdentityCard extends StatelessWidget {
                   _initials(twin.fullName),
                   style: AppTypography.numeric(
                     fontSize: 20,
-                    color: AppColors.primary,
+                    color: AppColors.onPrimary,
                   ),
                 ),
               ),
@@ -137,52 +153,78 @@ class _IdentityCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(twin.fullName, style: text.titleLarge),
+                    Text(
+                      twin.fullName,
+                      style: text.titleLarge?.copyWith(
+                        color: AppColors.onPrimary,
+                      ),
+                    ),
                     const SizedBox(height: 2),
-                    Text(_subtitle(twin), style: text.bodyMedium),
+                    Text(
+                      _subtitle(twin),
+                      style: text.bodyMedium?.copyWith(
+                        color: AppColors.onPrimary.withValues(alpha: 0.8),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.xl),
-          const Divider(),
-          const SizedBox(height: AppSpacing.lg),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text('Decentralised identity', style: text.labelSmall),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      twin.did,
-                      style: text.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.onPrimary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Ontomorph identity',
+                        style: text.labelSmall?.copyWith(
+                          color: AppColors.onPrimary.withValues(alpha: 0.7),
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        twin.did,
+                        style: text.bodyMedium?.copyWith(
+                          color: AppColors.onPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              IconButton(
-                tooltip: 'Copy identifier',
-                onPressed: () async {
-                  await Clipboard.setData(ClipboardData(text: twin.did));
-                  if (context.mounted) {
-                    AppSnack.show(context, 'Twin identifier copied');
-                  }
-                },
-                icon: const Icon(Icons.copy_rounded, size: 18),
-              ),
-            ],
+                IconButton(
+                  tooltip: 'Copy identifier',
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: twin.did));
+                    if (context.mounted) {
+                      AppSnack.show(context, 'Twin identifier copied');
+                    }
+                  },
+                  icon: Icon(
+                    Icons.copy_rounded,
+                    size: 18,
+                    color: AppColors.onPrimary.withValues(alpha: 0.85),
+                  ),
+                ),
+              ],
+            ),
           ),
           if (twin.createdAt != null) ...<Widget>[
             const SizedBox(height: AppSpacing.md),
             Text(
               'Twin created ${DateFormat('d MMMM yyyy').format(twin.createdAt!)}',
-              style: text.bodySmall,
+              style: text.bodySmall?.copyWith(
+                color: AppColors.onPrimary.withValues(alpha: 0.7),
+              ),
             ),
           ],
         ],
