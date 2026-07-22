@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../application/auth_controller.dart';
 import '../domain/validators.dart';
 import 'widgets/auth_header.dart';
@@ -73,37 +74,46 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   const SizedBox(height: AppSpacing.huge),
-                  const AuthHeader(
-                    title: 'Welcome back',
-                    subtitle: 'Sign in to open your digital twin.',
+                  const EntranceFade(
+                    index: 0,
+                    child: AuthHeader(
+                      title: 'Welcome back',
+                      subtitle: 'Sign in to open your digital twin.',
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.huge),
-                  AppTextField(
-                    label: 'Email address',
-                    controller: _email,
-                    hintText: 'you@example.com',
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    validator: Validators.email,
-                    autofillHints: const <String>[AutofillHints.email],
+                  EntranceFade(
+                    index: 1,
+                    child: AppTextField(
+                      label: 'Email address',
+                      controller: _email,
+                      hintText: 'you@example.com',
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      validator: Validators.email,
+                      autofillHints: const <String>[AutofillHints.email],
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
-                  AppTextField(
-                    label: 'Password',
-                    controller: _password,
-                    obscureText: _obscured,
-                    textInputAction: TextInputAction.done,
-                    validator: Validators.password,
-                    autofillHints: const <String>[AutofillHints.password],
-                    suffix: IconButton(
-                      icon: Icon(
-                        _obscured
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        size: 20,
-                        color: AppColors.textTertiary,
+                  EntranceFade(
+                    index: 2,
+                    child: AppTextField(
+                      label: 'Password',
+                      controller: _password,
+                      obscureText: _obscured,
+                      textInputAction: TextInputAction.done,
+                      validator: Validators.password,
+                      autofillHints: const <String>[AutofillHints.password],
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscured
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          size: 20,
+                          color: AppColors.textTertiary,
+                        ),
+                        onPressed: () => setState(() => _obscured = !_obscured),
                       ),
-                      onPressed: () => setState(() => _obscured = !_obscured),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -135,7 +145,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text('New to MedGuardian?', style: text.bodyMedium),
+                        Text('New here?', style: text.bodyMedium),
                         TextButton(
                           onPressed: () => context.push(Routes.signUp),
                           child: const Text('Create an account'),

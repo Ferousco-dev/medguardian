@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/brand_mark.dart';
 
@@ -16,11 +17,23 @@ class AuthHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const BrandMark(size: 44),
-        const SizedBox(height: AppSpacing.xxl),
-        Text(title, style: text.headlineMedium),
+        Container(
+          height: 56,
+          width: 56,
+          decoration: BoxDecoration(
+            color: AppColors.primaryTint,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          alignment: Alignment.center,
+          child: const BrandMark(size: 34),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        Text(title, style: text.displaySmall?.copyWith(fontSize: 28)),
         const SizedBox(height: AppSpacing.sm),
-        Text(subtitle, style: text.bodyLarge),
+        Text(
+          subtitle,
+          style: text.bodyLarge?.copyWith(color: AppColors.textSecondary),
+        ),
       ],
     );
   }

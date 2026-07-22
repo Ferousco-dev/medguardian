@@ -9,6 +9,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
+import '../../../shared/widgets/section_card.dart';
 import '../application/auth_controller.dart';
 import '../domain/validators.dart';
 import 'widgets/auth_header.dart';
@@ -99,12 +101,41 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 const SizedBox(height: AppSpacing.lg),
-                const AuthHeader(
-                  title: 'Create your account',
-                  subtitle:
-                      'This is the first step towards your digital health twin.',
+                const EntranceFade(
+                  index: 0,
+                  child: AuthHeader(
+                    title: 'Create your account',
+                    subtitle:
+                        'This is the first step towards your digital health twin.',
+                  ),
                 ),
-                const SizedBox(height: AppSpacing.huge),
+                const SizedBox(height: AppSpacing.xl),
+                EntranceFade(
+                  index: 1,
+                  child: SectionCard(
+                    color: AppColors.primaryTint,
+                    borderColor: AppColors.primaryTint,
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(
+                          Icons.schedule_rounded,
+                          size: 17,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Text(
+                            'Three fields. Your health details come after, and '
+                            'you can skip those.',
+                            style: text.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xxl),
                 AppTextField(
                   label: 'Full name',
                   controller: _name,
@@ -159,8 +190,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
                           'I understand MedGuardian gives health guidance, not '
-                          'a medical diagnosis, and my records stay under my '
-                          'control.',
+                          'a diagnosis, and that my record stays mine.',
                           style: text.bodyMedium,
                         ),
                       ),
