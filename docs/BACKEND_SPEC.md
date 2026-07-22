@@ -109,9 +109,14 @@ Invalidate the token server-side. Response `204`. The client clears local storag
 
 ### `POST /twin`
 
-Creates the Digital Twin for the authenticated user.
+Creates the Digital Twin for the authenticated user. The client calls this immediately after registration with **only the name**, because health details are collected afterwards in a flow the user is allowed to skip.
 
-Request:
+Minimum request the client actually sends:
+```json
+{ "full_name": "Ada Okoro" }
+```
+
+Full request shape, all fields other than `full_name` optional:
 ```json
 {
   "full_name": "Ada Okoro",
@@ -126,7 +131,9 @@ Request:
 }
 ```
 
-`sex` is one of `female`, `male`, `intersex`, `undisclosed`. Any unrecognised value is coerced to `undisclosed` by the client, but please send one of these four.
+**Do not require the health fields.** A twin with nothing but a name is a valid, expected state. `date_of_birth`, `height_cm`, `weight_kg` and `blood_type` must all accept `null`, and the array fields must accept `[]`.
+
+`sex` is one of `female`, `male`, `intersex`, `undisclosed`. Any unrecognised or absent value is treated as `undisclosed` by the client, which is also the value it sends when the user skips that question.
 
 Response `201`: the twin object (see below).
 
@@ -155,13 +162,17 @@ Response `200`:
 
 `did` must be the real Ontomorph decentralised identifier. The client displays it on the twin profile and the emergency card, and truncates it for compact display.
 
-BMI is **not** sent. The client derives it from `height_cm` and `weight_kg`.
+BMI is **not** sent. The client derives it from `height_cm` and `weight_kg`, and treats it as unknown when either is missing.
+
+**Nullable fields.** `date_of_birth`, `height_cm`, `weight_kg` and `blood_type` may all be `null` on a partially completed twin. Send `null`, never `0` or an empty string. The client counts how many of the nine profile fields are populated and shows the user a completion percentage, so a zero would be read as a real answer and inflate that number.
 
 Return `404` if no twin exists yet, so the client can route to twin setup.
 
 ### `PATCH /twin/profile`
 
-Partial update. Accepts any subset of the writable fields from `POST /twin`. Response `200`: the full updated twin.
+Partial update, used by the health details flow and by every later edit. Accepts any subset of the writable fields from `POST /twin`. Response `200`: the full updated twin.
+
+Because the flow is skippable and resumable, this endpoint gets called repeatedly with partial payloads. Merge into the existing twin rather than replacing it, and never reject a payload for missing fields.
 
 ---
 
@@ -539,7 +550,37 @@ Response `201`:
 
 ---
 
-## 10. Hospitals
+## 10. Health library
+
+### `GET /guides`
+
+Optional. The client currently ships this content locally, so the library works offline and needs no backend. Implement it only if content should be editable without an app release.
+
+```json
+[
+  {
+    "id": "guide_bp",
+    "title": "Taking a blood pressure reading that actually means something",
+    "summary": "Most home readings are wrong for avoidable reasons.",
+    "image_url": "https://images.unsplash.com/photo-1615486511484-92e172cc4fe0",
+    "read_minutes": 3,
+    "related_biomarker": "blood_pressure_systolic",
+    "sections": [
+      {
+        "heading": "Why the number moves so much",
+        "body": "Blood pressure is not one value...",
+        "points": ["Sit still for five minutes with your back supported"]
+      }
+    ]
+  }
+]
+```
+
+`related_biomarker` matches a biomarker `code`, so a guide can be surfaced next to the trend it explains.
+
+---
+
+## 11. Hospitals
 
 ### `GET /hospitals/nearby?lat=6.45&lng=3.42`
 
@@ -567,7 +608,7 @@ Sort nearest first. `image_url` must be a plain HTTPS image URL, the client appe
 
 ---
 
-## 11. Build order
+## 12. Build order
 
 If time is short, build in this order. The client degrades gracefully and shows an error state per section, so partial delivery still demos.
 
@@ -585,12 +626,15 @@ Steps 1 to 6 cover the core demo. Everything after that is upside.
 
 ---
 
-## 12. Checklist before handing back the URL
+## 13. Checklist before handing back the URL
 
 - [ ] HTTPS, with a valid certificate. Android blocks plain HTTP by default.
 - [ ] CORS is irrelevant for the mobile client, ignore it unless a web build is added.
 - [ ] `GET /auth/me` returns `401`, not `500`, for a bad token.
 - [ ] `GET /twin` returns `404`, not `500`, when no twin exists.
+- [ ] `POST /twin` succeeds with `{"full_name": "..."}` and nothing else.
+- [ ] `PATCH /twin/profile` merges partial payloads instead of replacing the twin.
+- [ ] Unset twin fields come back as `null`, never `0` or `""`.
 - [ ] Every timestamp is ISO 8601.
 - [ ] Every key is `snake_case`.
 - [ ] Biomarker `readings` are sorted oldest first.
