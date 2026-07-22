@@ -49,7 +49,7 @@ class BiomarkersScreen extends ConsumerWidget {
                   AppSpacing.page,
                   AppSpacing.lg,
                   AppSpacing.page,
-                  AppSpacing.huge,
+                  104,
                 ),
                 itemCount: value.length,
                 separatorBuilder: (_, _) =>

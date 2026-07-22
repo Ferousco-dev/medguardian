@@ -100,27 +100,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPageChanged: (int index) => setState(() => _index = index),
                 itemBuilder: (BuildContext context, int index) {
                   final OnboardingPageData page = _pages[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.page,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const Spacer(),
-                        page.visual,
-                        const SizedBox(height: AppSpacing.huge),
-                        Text(page.title, style: text.headlineMedium),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          page.body,
-                          style: text.bodyLarge?.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
+                  return LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                          return SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.page,
+                              vertical: AppSpacing.lg,
+                            ),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight:
+                                    constraints.maxHeight - AppSpacing.xxl,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  page.visual,
+                                  const SizedBox(height: AppSpacing.xxxl),
+                                  Text(page.title, style: text.headlineMedium),
+                                  const SizedBox(height: AppSpacing.md),
+                                  Text(
+                                    page.body,
+                                    style: text.bodyLarge?.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                   );
                 },
               ),
