@@ -309,7 +309,7 @@ class _GuideCarousel extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
         itemBuilder: (BuildContext context, int index) => GuideCard(
           guide: guides[index],
-          onTap: () => context.push('\${Routes.guides}/\${guides[index].id}'),
+          onTap: () => context.push('${Routes.guides}/${guides[index].id}'),
         ),
       ),
     );

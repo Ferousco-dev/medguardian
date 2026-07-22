@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -39,8 +40,29 @@ class GuideDetailScreen extends StatelessWidget {
             pinned: true,
             backgroundColor: AppColors.surface,
             surfaceTintColor: Colors.transparent,
+            systemOverlayStyle: SystemUiOverlayStyle.light,
+            leading: Padding(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              child: Material(
+                color: AppColors.surface,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => Navigator.of(context).maybePop(),
+                  child: const Icon(Icons.arrow_back_rounded, size: 20),
+                ),
+              ),
+            ),
             flexibleSpace: FlexibleSpaceBar(
-              background: GuideImage(url: guide.imageUrl, height: 220),
+              background: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  GuideImage(url: guide.imageUrl, height: 220),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(color: Color(0x14000000)),
+                  ),
+                ],
+              ),
             ),
           ),
           SliverPadding(

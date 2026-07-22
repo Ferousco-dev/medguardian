@@ -164,6 +164,7 @@ class _HealthSetupScreenState extends ConsumerState<HealthSetupScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         leading: _step == 0
             ? null
             : IconButton(

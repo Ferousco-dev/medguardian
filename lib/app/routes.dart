@@ -8,9 +8,6 @@ abstract final class Routes {
   static const String healthSetupEdit = '/health-setup/edit';
 
   static const String dashboard = '/dashboard';
-  static const String twin = '/twin';
-  static const String timeline = '/timeline';
-  static const String biomarkers = '/biomarkers';
   static const String settings = '/settings';
 
   static const String symptomCheck = '/symptom-check';
