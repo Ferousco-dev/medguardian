@@ -11,6 +11,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../data/models/hospital.dart';
 import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/section_card.dart';
 import '../../../shared/widgets/status_pill.dart';
 
@@ -76,7 +77,10 @@ class HospitalsScreen extends ConsumerWidget {
                       separatorBuilder: (_, _) =>
                           const SizedBox(height: AppSpacing.lg),
                       itemBuilder: (BuildContext context, int index) =>
-                          HospitalCard(hospital: value[index]),
+                          EntranceFade(
+                            index: index,
+                            child: HospitalCard(hospital: value[index]),
+                          ),
                     ),
                   );
                 },
@@ -187,27 +191,64 @@ class HospitalCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           if (hospital.imageUrl != null)
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AppRadius.lg),
-              ),
-              child: CachedNetworkImage(
-                imageUrl: AppImages.sized(hospital.imageUrl!, width: 900),
-                height: 132,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (_, _) =>
-                    Container(height: 132, color: AppColors.surfaceMuted),
-                errorWidget: (_, _, _) => Container(
-                  height: 132,
-                  color: AppColors.surfaceMuted,
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.local_hospital_outlined,
-                    color: AppColors.textTertiary,
+            Stack(
+              children: <Widget>[
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(AppRadius.lg),
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: AppImages.sized(hospital.imageUrl!, width: 900),
+                    height: 132,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (_, _) =>
+                        Container(height: 132, color: AppColors.surfaceMuted),
+                    errorWidget: (_, _, _) => Container(
+                      height: 132,
+                      color: AppColors.surfaceMuted,
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.local_hospital_outlined,
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                if (hospital.hasEmergency)
+                  Positioned(
+                    top: AppSpacing.md,
+                    left: AppSpacing.md,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.danger,
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Icon(
+                            Icons.emergency_outlined,
+                            size: 12,
+                            color: AppColors.onPrimary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Emergency',
+                            style: text.labelSmall?.copyWith(
+                              color: AppColors.onPrimary,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
             ),
           Padding(
             padding: const EdgeInsets.all(AppSpacing.xl),
@@ -241,13 +282,6 @@ class HospitalCard extends StatelessWidget {
                       'about ${hospital.travelMinutes} min away',
                       style: text.bodySmall,
                     ),
-                    const Spacer(),
-                    if (hospital.hasEmergency)
-                      const StatusPill(
-                        label: 'Emergency',
-                        tone: StatusTone.critical,
-                        icon: Icons.emergency_outlined,
-                      ),
                   ],
                 ),
                 if (hospital.specialties.isNotEmpty) ...<Widget>[
