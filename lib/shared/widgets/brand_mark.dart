@@ -8,40 +8,28 @@ class BrandMark extends StatelessWidget {
     this.size = 72,
     this.color = AppColors.primary,
     this.traceColor = AppColors.surface,
-    this.filled = true,
   });
 
   final double size;
   final Color color;
   final Color traceColor;
 
-  final bool filled;
-
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
       dimension: size,
       child: CustomPaint(
-        painter: _BrandMarkPainter(
-          color: color,
-          traceColor: traceColor,
-          filled: filled,
-        ),
+        painter: _BrandMarkPainter(color: color, traceColor: traceColor),
       ),
     );
   }
 }
 
 class _BrandMarkPainter extends CustomPainter {
-  const _BrandMarkPainter({
-    required this.color,
-    required this.traceColor,
-    required this.filled,
-  });
+  const _BrandMarkPainter({required this.color, required this.traceColor});
 
   final Color color;
   final Color traceColor;
-  final bool filled;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -49,44 +37,53 @@ class _BrandMarkPainter extends CustomPainter {
     final double h = size.height;
 
     final Path shield = Path()
-      ..moveTo(w * 0.5, h * 0.04)
-      ..lineTo(w * 0.9, h * 0.2)
-      ..lineTo(w * 0.9, h * 0.52)
-      ..cubicTo(w * 0.9, h * 0.78, w * 0.72, h * 0.92, w * 0.5, h * 0.98)
-      ..cubicTo(w * 0.28, h * 0.92, w * 0.1, h * 0.78, w * 0.1, h * 0.52)
-      ..lineTo(w * 0.1, h * 0.2)
+      ..moveTo(w * 0.500, h * 0.090)
+      ..quadraticBezierTo(w * 0.335, h * 0.168, w * 0.196, h * 0.216)
+      ..lineTo(w * 0.196, h * 0.602)
+      ..cubicTo(
+        w * 0.196,
+        h * 0.742,
+        w * 0.330,
+        h * 0.846,
+        w * 0.500,
+        h * 0.906,
+      )
+      ..cubicTo(
+        w * 0.670,
+        h * 0.846,
+        w * 0.804,
+        h * 0.742,
+        w * 0.804,
+        h * 0.602,
+      )
+      ..lineTo(w * 0.804, h * 0.216)
+      ..quadraticBezierTo(w * 0.665, h * 0.168, w * 0.500, h * 0.090)
       ..close();
 
-    final Paint shieldPaint = Paint()
-      ..color = color
-      ..style = filled ? PaintingStyle.fill : PaintingStyle.stroke
-      ..strokeWidth = w * 0.075
-      ..strokeJoin = StrokeJoin.round;
-
-    canvas.drawPath(shield, shieldPaint);
+    canvas.drawPath(shield, Paint()..color = color);
 
     final Path trace = Path()
-      ..moveTo(w * 0.24, h * 0.5)
-      ..lineTo(w * 0.38, h * 0.5)
-      ..lineTo(w * 0.45, h * 0.34)
-      ..lineTo(w * 0.56, h * 0.66)
-      ..lineTo(w * 0.63, h * 0.5)
-      ..lineTo(w * 0.76, h * 0.5);
+      ..moveTo(w * 0.232, h * 0.497)
+      ..lineTo(w * 0.356, h * 0.497)
+      ..lineTo(w * 0.386, h * 0.437)
+      ..lineTo(w * 0.420, h * 0.518)
+      ..lineTo(w * 0.487, h * 0.272)
+      ..lineTo(w * 0.552, h * 0.666)
+      ..lineTo(w * 0.601, h * 0.497)
+      ..lineTo(w * 0.775, h * 0.497);
 
-    final Paint tracePaint = Paint()
-      ..color = filled ? traceColor : color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.085
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    canvas.drawPath(trace, tracePaint);
+    canvas.drawPath(
+      trace,
+      Paint()
+        ..color = traceColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = w * 0.036
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
   }
 
   @override
-  bool shouldRepaint(_BrandMarkPainter oldDelegate) {
-    return oldDelegate.color != color ||
-        oldDelegate.traceColor != traceColor ||
-        oldDelegate.filled != filled;
-  }
+  bool shouldRepaint(_BrandMarkPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.traceColor != traceColor;
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 abstract final class AppColors {
-  static const Color primary = Color(0xFF0B6E5F);
-  static const Color primaryDark = Color(0xFF085246);
-  static const Color primaryTint = Color(0xFFE4F2EF);
+  static const Color primary = Color(0xFF057064);
+  static const Color primaryDark = Color(0xFF04564D);
+  static const Color primaryTint = Color(0xFFE3F0EE);
   static const Color onPrimary = Color(0xFFFFFFFF);
 
   static const Color background = Color(0xFFF7F9F8);
@@ -27,7 +27,7 @@ abstract final class AppColors {
   static const Color infoTint = Color(0xFFEAEFFC);
 
   static const List<Color> chartSeries = <Color>[
-    Color(0xFF0B6E5F),
+    Color(0xFF057064),
     Color(0xFF1D4ED8),
     Color(0xFFB45309),
     Color(0xFF7C3AED),
