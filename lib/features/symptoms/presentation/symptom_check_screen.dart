@@ -189,15 +189,38 @@ class _InputState extends StatelessWidget {
   }
 }
 
-class _AnalysingState extends StatelessWidget {
+class _AnalysingState extends StatefulWidget {
   const _AnalysingState();
 
+  @override
+  State<_AnalysingState> createState() => _AnalysingStateState();
+}
+
+class _AnalysingStateState extends State<_AnalysingState> {
   static const List<String> _steps = <String>[
     'Reading your description',
     'Checking against your twin history',
     'Comparing biomarker trends',
     'Assessing urgency',
   ];
+
+  int _done = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _advance();
+  }
+
+  Future<void> _advance() async {
+    for (int i = 0; i < _steps.length; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 380));
+      if (!mounted) {
+        return;
+      }
+      setState(() => _done = i + 1);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,29 +232,58 @@ class _AnalysingState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const SizedBox.square(
-            dimension: 24,
-            child: CircularProgressIndicator(strokeWidth: 2.5),
+          Text('Analysing', style: text.headlineSmall),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Reading this against everything already on your twin.',
+            style: text.bodyMedium,
           ),
           const SizedBox(height: AppSpacing.xxl),
-          Text('Analysing', style: text.headlineSmall),
-          const SizedBox(height: AppSpacing.xxl),
-          for (final String step in _steps) ...<Widget>[
+          for (int i = 0; i < _steps.length; i++)
             Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              padding: const EdgeInsets.only(bottom: AppSpacing.lg),
               child: Row(
                 children: <Widget>[
-                  const Icon(
-                    Icons.circle,
-                    size: 6,
-                    color: AppColors.textTertiary,
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    height: 22,
+                    width: 22,
+                    decoration: BoxDecoration(
+                      color: i < _done
+                          ? AppColors.primary
+                          : AppColors.surfaceMuted,
+                      shape: BoxShape.circle,
+                    ),
+                    child: i < _done
+                        ? const Icon(
+                            Icons.check_rounded,
+                            size: 13,
+                            color: AppColors.onPrimary,
+                          )
+                        : i == _done
+                        ? const Padding(
+                            padding: EdgeInsets.all(5),
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : null,
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  Text(step, style: text.bodyMedium),
+                  Expanded(
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 250),
+                      style:
+                          (i <= _done
+                              ? text.titleSmall
+                              : text.bodyMedium?.copyWith(
+                                  color: AppColors.textTertiary,
+                                )) ??
+                          const TextStyle(),
+                      child: Text(_steps[i]),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
         ],
       ),
     );
