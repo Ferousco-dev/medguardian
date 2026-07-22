@@ -7,6 +7,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../data/models/health_simulation.dart';
 import '../../../shared/widgets/async_view.dart';
 import '../../../shared/widgets/section_card.dart';
+import '../../../shared/widgets/entrance.dart';
 import '../../../shared/widgets/section_heading.dart';
 import '../../../shared/widgets/status_pill.dart';
 import '../application/simulation_controller.dart';
@@ -85,14 +86,30 @@ class _QuestionPicker extends StatelessWidget {
         AppSpacing.huge,
       ),
       children: <Widget>[
+        Container(
+          height: 52,
+          width: 52,
+          decoration: BoxDecoration(
+            color: AppColors.primaryTint,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          child: const Icon(
+            Icons.query_stats_rounded,
+            size: 25,
+            color: AppColors.primary,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xl),
         Text('Project your health forward', style: text.headlineSmall),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Your twin runs your current trends forward in time so you can see '
           'where they lead before they get there.',
-          style: text.bodyMedium,
+          style: text.bodyLarge?.copyWith(color: AppColors.textSecondary),
         ),
         const SizedBox(height: AppSpacing.xxl),
+        Text('Pick a question', style: text.labelMedium),
+        const SizedBox(height: AppSpacing.md),
         for (final String question in questions) ...<Widget>[
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -177,13 +194,14 @@ class _Result extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xxl),
         const SectionHeading(title: 'What each stage looks like'),
-        for (final SimulationHorizon horizon
-            in simulation.horizons) ...<Widget>[
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: _HorizonCard(horizon: horizon),
+        for (int i = 0; i < simulation.horizons.length; i++)
+          EntranceFade(
+            index: i,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: _HorizonCard(horizon: simulation.horizons[i]),
+            ),
           ),
-        ],
         if (simulation.preventiveActions.isNotEmpty) ...<Widget>[
           const SizedBox(height: AppSpacing.lg),
           const SectionHeading(title: 'How to change this outcome'),
