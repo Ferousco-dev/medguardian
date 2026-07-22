@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
-import 'section_card.dart';
 import 'status_pill.dart';
 
 class MetricTile extends StatelessWidget {
@@ -26,49 +25,116 @@ class MetricTile extends StatelessWidget {
   final List<double>? sparkline;
   final VoidCallback? onTap;
 
+  Color get _accent => deltaTone == StatusTone.neutral
+      ? AppColors.primary
+      : deltaTone.foreground;
+
+  IconData? get _deltaIcon => switch (deltaTone) {
+    StatusTone.positive => Icons.trending_down_rounded,
+    StatusTone.caution || StatusTone.critical => Icons.trending_up_rounded,
+    _ => null,
+  };
+
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
 
-    return SectionCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(label, style: text.bodySmall, maxLines: 1),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: <Widget>[
-              Text(value, style: AppTypography.numeric(fontSize: 24)),
-              if (unit != null) ...<Widget>[
-                const SizedBox(width: AppSpacing.xs),
-                Text(unit!, style: text.bodySmall),
-              ],
-            ],
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: AppColors.border),
           ),
-          if (sparkline != null) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            SizedBox(
-              height: 26,
-              width: double.infinity,
-              child: CustomPaint(
-                painter: SparklinePainter(
-                  values: sparkline!,
-                  color: deltaTone == StatusTone.neutral
-                      ? AppColors.primary
-                      : deltaTone.foreground,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                  0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 32,
+                      child: Text(
+                        label,
+                        style: text.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: <Widget>[
+                        Flexible(
+                          child: Text(
+                            value,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.numeric(fontSize: 26),
+                          ),
+                        ),
+                        if (unit != null) ...<Widget>[
+                          const SizedBox(width: 3),
+                          Text(unit!, style: text.bodySmall),
+                        ],
+                      ],
+                    ),
+                    if (deltaLabel != null) ...<Widget>[
+                      const SizedBox(height: AppSpacing.sm),
+                      Row(
+                        children: <Widget>[
+                          if (_deltaIcon != null) ...<Widget>[
+                            Icon(_deltaIcon, size: 13, color: _accent),
+                            const SizedBox(width: 3),
+                          ],
+                          Flexible(
+                            child: Text(
+                              deltaLabel!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: text.labelSmall?.copyWith(
+                                color: _accent,
+                                letterSpacing: 0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
                 ),
               ),
-            ),
-          ],
-          if (deltaLabel != null) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            StatusPill(label: deltaLabel!, tone: deltaTone),
-          ],
-        ],
+              const SizedBox(height: AppSpacing.md),
+              if (sparkline != null && sparkline!.length > 1)
+                SizedBox(
+                  height: 34,
+                  width: double.infinity,
+                  child: CustomPaint(
+                    painter: SparklinePainter(
+                      values: sparkline!,
+                      color: _accent,
+                    ),
+                  ),
+                )
+              else
+                const SizedBox(height: 34),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -91,29 +157,54 @@ class SparklinePainter extends CustomPainter {
     final double range = max - min;
     final double step = size.width / (values.length - 1);
 
-    final Path path = Path();
-    for (int i = 0; i < values.length; i++) {
+    const double topInset = 6;
+    final double usable = size.height - topInset;
+
+    Offset pointAt(int i) {
       final double normalised = range == 0 ? 0.5 : (values[i] - min) / range;
-      final Offset point = Offset(
-        step * i,
-        size.height - (normalised * size.height),
-      );
-      if (i == 0) {
-        path.moveTo(point.dx, point.dy);
-      } else {
-        path.lineTo(point.dx, point.dy);
-      }
+      return Offset(step * i, topInset + usable - (normalised * usable));
     }
 
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round,
-    );
+    final Path line = Path();
+    final Path fill = Path()..moveTo(0, size.height);
+
+    for (int i = 0; i < values.length; i++) {
+      final Offset p = pointAt(i);
+      if (i == 0) {
+        line.moveTo(p.dx, p.dy);
+      } else {
+        line.lineTo(p.dx, p.dy);
+      }
+      fill.lineTo(p.dx, p.dy);
+    }
+
+    fill
+      ..lineTo(size.width, size.height)
+      ..close();
+
+    canvas
+      ..drawPath(fill, Paint()..color = color.withValues(alpha: 0.10))
+      ..drawPath(
+        line,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round,
+      );
+
+    final Offset last = pointAt(values.length - 1);
+    canvas
+      ..drawCircle(last, 3.2, Paint()..color = AppColors.surface)
+      ..drawCircle(
+        last,
+        3.2,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
   }
 
   @override

@@ -11,22 +11,22 @@ class QuickActions extends StatelessWidget {
   static const List<_Action> _actions = <_Action>[
     _Action(
       icon: Icons.add_comment_outlined,
-      label: 'Report symptom',
+      label: 'Report\nsymptom',
       route: Routes.symptomCheck,
     ),
     _Action(
       icon: Icons.forum_outlined,
-      label: 'Ask assistant',
+      label: 'Ask\nassistant',
       route: Routes.healthChat,
     ),
     _Action(
       icon: Icons.medication_outlined,
-      label: 'Medications',
+      label: 'My\nmedications',
       route: Routes.medications,
     ),
     _Action(
-      icon: Icons.share_outlined,
-      label: 'Share record',
+      icon: Icons.ios_share_outlined,
+      label: 'Share\nrecord',
       route: Routes.clinicalSummary,
     ),
   ];
@@ -34,6 +34,7 @@ class QuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         for (int i = 0; i < _actions.length; i++) ...<Widget>[
           if (i > 0) const SizedBox(width: AppSpacing.md),
@@ -68,23 +69,36 @@ class _ActionButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(
             vertical: AppSpacing.lg,
-            horizontal: AppSpacing.sm,
+            horizontal: AppSpacing.xs,
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: AppColors.border),
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Icon(action.icon, size: 22, color: AppColors.primary),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                action.label,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textSecondary,
-                  letterSpacing: 0,
+              Container(
+                height: 38,
+                width: 38,
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryTint,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(action.icon, size: 19, color: AppColors.primary),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              SizedBox(
+                height: 30,
+                child: Text(
+                  action.label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppColors.textPrimary,
+                    letterSpacing: 0,
+                    height: 1.25,
+                  ),
                 ),
               ),
             ],

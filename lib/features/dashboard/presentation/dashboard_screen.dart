@@ -6,6 +6,7 @@ import '../../../app/providers.dart';
 import '../../../app/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../../data/models/biomarker.dart';
 import '../../../data/models/digital_twin.dart';
 import '../../../data/models/health_insight.dart';
@@ -70,7 +71,7 @@ class DashboardScreen extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.page,
-              AppSpacing.sm,
+              AppSpacing.xl,
               AppSpacing.page,
               AppSpacing.huge,
             ),
@@ -104,7 +105,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.xxl),
               const QuickActions(),
-              const SizedBox(height: AppSpacing.xxxl),
+              const SizedBox(height: AppSpacing.xxl),
               SectionHeading(
                 title: 'Your vitals',
                 actionLabel: 'See all',
@@ -127,7 +128,7 @@ class DashboardScreen extends ConsumerWidget {
                       .toList(growable: false),
                 ),
               ),
-              const SizedBox(height: AppSpacing.xxxl),
+              const SizedBox(height: AppSpacing.xxl),
               SectionHeading(
                 title: 'What your twin noticed',
                 actionLabel: 'Simulate',
@@ -157,7 +158,7 @@ class DashboardScreen extends ConsumerWidget {
                   );
                 },
               ),
-              const SizedBox(height: AppSpacing.xxxl),
+              const SizedBox(height: AppSpacing.xxl),
               SectionHeading(
                 title: 'Worth reading',
                 actionLabel: 'Library',
@@ -196,26 +197,81 @@ class _Greeting extends StatelessWidget {
 
     return Row(
       children: <Widget>[
+        Container(
+          height: 44,
+          width: 44,
+          decoration: const BoxDecoration(
+            color: AppColors.primaryTint,
+            shape: BoxShape.circle,
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            _initials(twin.valueOrNull?.fullName ?? ''),
+            style: AppTypography.numeric(
+              fontSize: 15,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(_timeOfDay, style: text.bodyMedium),
-              const SizedBox(height: 2),
-              Text(firstName, style: text.headlineSmall),
+              Text(_timeOfDay, style: text.bodySmall),
+              const SizedBox(height: 1),
+              Text(
+                firstName,
+                style: text.titleLarge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),
-        IconButton(
-          onPressed: () => context.push(Routes.emergency),
-          style: IconButton.styleFrom(
-            backgroundColor: AppColors.dangerTint,
-            foregroundColor: AppColors.danger,
+        const SizedBox(width: AppSpacing.sm),
+        Material(
+          color: AppColors.dangerTint,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            onTap: () => context.push(Routes.emergency),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Icon(
+                    Icons.emergency_outlined,
+                    size: 15,
+                    color: AppColors.danger,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(
+                    'Emergency',
+                    style: text.labelMedium?.copyWith(color: AppColors.danger),
+                  ),
+                ],
+              ),
+            ),
           ),
-          icon: const Icon(Icons.emergency_outlined, size: 20),
         ),
       ],
     );
+  }
+
+  static String _initials(String name) {
+    final List<String> parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) {
+      return '?';
+    }
+    if (parts.length == 1) {
+      return parts.first[0].toUpperCase();
+    }
+    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 }
 
@@ -272,10 +328,11 @@ class _VitalsGrid extends StatelessWidget {
   static String? _deltaLabel(Biomarker biomarker) {
     final double? delta = biomarker.delta;
     if (delta == null || delta == 0) {
-      return biomarker.isOutOfRange ? 'Out of range' : 'Stable';
+      return biomarker.isOutOfRange ? 'Above range' : 'No change';
     }
     final String sign = delta > 0 ? '+' : '';
-    return '$sign${delta.toStringAsFixed(delta.abs() < 1 ? 1 : 0)}';
+    final String amount = delta.toStringAsFixed(delta.abs() < 1 ? 1 : 0);
+    return '$sign$amount since last';
   }
 
   static StatusTone _tone(Biomarker biomarker) {
