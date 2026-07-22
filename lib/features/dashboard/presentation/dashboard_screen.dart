@@ -1,0 +1,271 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../app/providers.dart';
+import '../../../app/routes.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../data/models/biomarker.dart';
+import '../../../data/models/digital_twin.dart';
+import '../../../data/models/health_insight.dart';
+import '../../../data/models/risk_score.dart';
+import '../../../shared/widgets/async_view.dart';
+import '../../../shared/widgets/metric_tile.dart';
+import '../../../shared/widgets/section_heading.dart';
+import '../../../shared/widgets/status_pill.dart';
+import 'widgets/insight_card.dart';
+import 'widgets/quick_actions.dart';
+import 'widgets/risk_score_card.dart';
+
+class DashboardScreen extends ConsumerWidget {
+  const DashboardScreen({super.key});
+
+  static const List<String> _pinnedBiomarkers = <String>[
+    'blood_pressure_systolic',
+    'blood_glucose',
+    'bmi',
+    'resting_heart_rate',
+  ];
+
+  Future<void> _refresh(WidgetRef ref) async {
+    ref
+      ..invalidate(twinProvider)
+      ..invalidate(riskScoreProvider)
+      ..invalidate(biomarkersProvider)
+      ..invalidate(insightsProvider);
+
+    await Future.wait(<Future<Object?>>[
+      ref.read(twinProvider.future),
+      ref.read(riskScoreProvider.future),
+      ref.read(biomarkersProvider.future),
+      ref.read(insightsProvider.future),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<DigitalTwin> twin = ref.watch(twinProvider);
+    final AsyncValue<RiskScore> risk = ref.watch(riskScoreProvider);
+    final AsyncValue<List<Biomarker>> biomarkers = ref.watch(
+      biomarkersProvider,
+    );
+    final AsyncValue<List<HealthInsight>> insights = ref.watch(
+      insightsProvider,
+    );
+
+    return Scaffold(
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () => _refresh(ref),
+          color: AppColors.primary,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.page,
+              AppSpacing.sm,
+              AppSpacing.page,
+              AppSpacing.huge,
+            ),
+            children: <Widget>[
+              _Greeting(twin: twin),
+              const SizedBox(height: AppSpacing.xxl),
+              AsyncView<RiskScore>(
+                value: risk,
+                onRetry: () => ref.invalidate(riskScoreProvider),
+                loading: const _CardSkeleton(height: 190),
+                data: (RiskScore value) => RiskScoreCard(
+                  score: value,
+                  onTap: () => context.push(Routes.riskScore),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxl),
+              const QuickActions(),
+              const SizedBox(height: AppSpacing.xxxl),
+              SectionHeading(
+                title: 'Your vitals',
+                actionLabel: 'See all',
+                onAction: () => context.push(Routes.biomarkers),
+              ),
+              AsyncView<List<Biomarker>>(
+                value: biomarkers,
+                onRetry: () => ref.invalidate(biomarkersProvider),
+                loading: const _CardSkeleton(height: 220),
+                data: (List<Biomarker> value) => _VitalsGrid(
+                  biomarkers: value
+                      .where(
+                        (Biomarker b) => _pinnedBiomarkers.contains(b.code),
+                      )
+                      .toList(growable: false),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxxl),
+              SectionHeading(
+                title: 'What your twin noticed',
+                actionLabel: 'Simulate',
+                onAction: () => context.push(Routes.simulation),
+              ),
+              AsyncView<List<HealthInsight>>(
+                value: insights,
+                onRetry: () => ref.invalidate(insightsProvider),
+                loading: const _CardSkeleton(height: 160),
+                data: (List<HealthInsight> value) {
+                  if (value.isEmpty) {
+                    return const EmptyState(
+                      icon: Icons.insights_outlined,
+                      title: 'No insights yet',
+                      body:
+                          'Log a few readings and your twin will start finding '
+                          'patterns.',
+                    );
+                  }
+                  return Column(
+                    children: <Widget>[
+                      for (int i = 0; i < value.length; i++) ...<Widget>[
+                        if (i > 0) const SizedBox(height: AppSpacing.md),
+                        InsightCard(insight: value[i]),
+                      ],
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Greeting extends StatelessWidget {
+  const _Greeting({required this.twin});
+
+  final AsyncValue<DigitalTwin> twin;
+
+  String get _timeOfDay {
+    final int hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good morning';
+    }
+    if (hour < 18) {
+      return 'Good afternoon';
+    }
+    return 'Good evening';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    final String firstName =
+        twin.valueOrNull?.fullName.split(' ').first ?? 'there';
+
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(_timeOfDay, style: text.bodyMedium),
+              const SizedBox(height: 2),
+              Text(firstName, style: text.headlineSmall),
+            ],
+          ),
+        ),
+        IconButton(
+          onPressed: () => context.push(Routes.emergency),
+          style: IconButton.styleFrom(
+            backgroundColor: AppColors.dangerTint,
+            foregroundColor: AppColors.danger,
+          ),
+          icon: const Icon(Icons.emergency_outlined, size: 20),
+        ),
+      ],
+    );
+  }
+}
+
+class _VitalsGrid extends StatelessWidget {
+  const _VitalsGrid({required this.biomarkers});
+
+  final List<Biomarker> biomarkers;
+
+  @override
+  Widget build(BuildContext context) {
+    if (biomarkers.isEmpty) {
+      return const EmptyState(
+        icon: Icons.monitor_heart_outlined,
+        title: 'No readings yet',
+        body: 'Log your first reading to start a trend.',
+      );
+    }
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: biomarkers.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: AppSpacing.md,
+        mainAxisSpacing: AppSpacing.md,
+        mainAxisExtent: 158,
+      ),
+      itemBuilder: (BuildContext context, int index) {
+        final Biomarker biomarker = biomarkers[index];
+        return MetricTile(
+          label: biomarker.name,
+          value: _format(biomarker.latest?.value),
+          unit: biomarker.unit,
+          deltaLabel: _deltaLabel(biomarker),
+          deltaTone: _tone(biomarker),
+          sparkline: biomarker.readings
+              .map((BiomarkerReading r) => r.value)
+              .toList(growable: false),
+          onTap: () => context.push(Routes.biomarkers),
+        );
+      },
+    );
+  }
+
+  static String _format(double? value) {
+    if (value == null) {
+      return '--';
+    }
+    return value % 1 == 0 ? value.toStringAsFixed(0) : value.toStringAsFixed(1);
+  }
+
+  static String? _deltaLabel(Biomarker biomarker) {
+    final double? delta = biomarker.delta;
+    if (delta == null || delta == 0) {
+      return biomarker.isOutOfRange ? 'Out of range' : 'Stable';
+    }
+    final String sign = delta > 0 ? '+' : '';
+    return '$sign${delta.toStringAsFixed(delta.abs() < 1 ? 1 : 0)}';
+  }
+
+  static StatusTone _tone(Biomarker biomarker) {
+    if (biomarker.isOutOfRange) {
+      return StatusTone.critical;
+    }
+    return switch (biomarker.trend) {
+      BiomarkerTrend.improving => StatusTone.positive,
+      BiomarkerTrend.stable => StatusTone.neutral,
+      BiomarkerTrend.worsening => StatusTone.caution,
+    };
+  }
+}
+
+class _CardSkeleton extends StatelessWidget {
+  const _CardSkeleton({required this.height});
+
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+    );
+  }
+}
