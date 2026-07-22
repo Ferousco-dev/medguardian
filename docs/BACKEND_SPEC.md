@@ -110,6 +110,17 @@ Response `200`:
 
 Return `401` if the token is invalid or expired.
 
+### `POST /auth/forgot-password`
+
+Request:
+```json
+{ "email": "ada.okoro@example.com" }
+```
+
+Response `204` **always**, whether or not the address is registered. Do not confirm or deny that an account exists, that leaks who your users are. The client shows "if that email has an account, a reset link is on its way" either way.
+
+Send a link with a token valid for 30 minutes. The reset page itself is web, not in the app.
+
 ### `POST /auth/logout`
 
 Invalidate the token server-side. Response `204`. The client clears local storage regardless of the outcome.
