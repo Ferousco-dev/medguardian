@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers.dart';
 import '../../../app/routes.dart';
+import '../../../data/models/digital_twin.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -61,7 +63,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
 
     if (success) {
-      context.go(Routes.profileSetup);
+      await ref
+          .read(twinRepositoryProvider)
+          .createTwin(
+            DigitalTwin(id: '', did: '', fullName: _name.text.trim()),
+          );
+      ref.invalidate(twinProvider);
+
+      if (mounted) {
+        context.go(Routes.healthSetup);
+      }
     }
   }
 

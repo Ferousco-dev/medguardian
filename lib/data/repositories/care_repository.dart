@@ -136,7 +136,7 @@ class MockCareRepository implements CareRepository {
             ],
             'gender': DemoData.twin.sex.apiValue,
             'birthDate': DemoData.twin.dateOfBirth
-                .toIso8601String()
+                ?.toIso8601String()
                 .split('T')
                 .first,
           },

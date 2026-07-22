@@ -3,10 +3,10 @@ class DigitalTwin {
     required this.id,
     required this.did,
     required this.fullName,
-    required this.dateOfBirth,
-    required this.sex,
-    required this.heightCm,
-    required this.weightKg,
+    this.dateOfBirth,
+    this.sex = BiologicalSex.undisclosed,
+    this.heightCm,
+    this.weightKg,
     this.bloodType,
     this.conditions = const <String>[],
     this.allergies = const <String>[],
@@ -20,10 +20,10 @@ class DigitalTwin {
   final String did;
 
   final String fullName;
-  final DateTime dateOfBirth;
+  final DateTime? dateOfBirth;
   final BiologicalSex sex;
-  final double heightCm;
-  final double weightKg;
+  final double? heightCm;
+  final double? weightKg;
   final String? bloodType;
 
   final List<String> conditions;
@@ -33,24 +33,30 @@ class DigitalTwin {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  int get age {
+  int? get age {
+    final DateTime? birth = dateOfBirth;
+    if (birth == null) {
+      return null;
+    }
     final DateTime now = DateTime.now();
-    int years = now.year - dateOfBirth.year;
+    int years = now.year - birth.year;
     final bool hadBirthday =
-        now.month > dateOfBirth.month ||
-        (now.month == dateOfBirth.month && now.day >= dateOfBirth.day);
+        now.month > birth.month ||
+        (now.month == birth.month && now.day >= birth.day);
     if (!hadBirthday) {
       years -= 1;
     }
     return years;
   }
 
-  double get bmi {
-    if (heightCm <= 0) {
-      return 0;
+  double? get bmi {
+    final double? height = heightCm;
+    final double? weight = weightKg;
+    if (height == null || weight == null || height <= 0) {
+      return null;
     }
-    final double metres = heightCm / 100;
-    return weightKg / (metres * metres);
+    final double metres = height / 100;
+    return weight / (metres * metres);
   }
 
   String get shortDid {
@@ -68,10 +74,10 @@ class DigitalTwin {
       id: json['id'] as String,
       did: json['did'] as String? ?? '',
       fullName: json['full_name'] as String? ?? '',
-      dateOfBirth: DateTime.parse(json['date_of_birth'] as String),
+      dateOfBirth: _parseDate(json['date_of_birth']),
       sex: BiologicalSex.fromApi(json['sex'] as String?),
-      heightCm: (json['height_cm'] as num?)?.toDouble() ?? 0,
-      weightKg: (json['weight_kg'] as num?)?.toDouble() ?? 0,
+      heightCm: (json['height_cm'] as num?)?.toDouble(),
+      weightKg: (json['weight_kg'] as num?)?.toDouble(),
       bloodType: json['blood_type'] as String?,
       conditions: _stringList(json['conditions']),
       allergies: _stringList(json['allergies']),
@@ -85,7 +91,7 @@ class DigitalTwin {
     'id': id,
     'did': did,
     'full_name': fullName,
-    'date_of_birth': dateOfBirth.toIso8601String(),
+    'date_of_birth': dateOfBirth?.toIso8601String(),
     'sex': sex.apiValue,
     'height_cm': heightCm,
     'weight_kg': weightKg,

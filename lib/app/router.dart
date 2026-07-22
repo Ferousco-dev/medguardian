@@ -16,7 +16,7 @@ import '../features/splash/presentation/splash_screen.dart';
 import '../features/summary/presentation/clinical_summary_screen.dart';
 import '../features/symptoms/presentation/symptom_check_screen.dart';
 import '../features/timeline/presentation/timeline_screen.dart';
-import '../features/twin/presentation/profile_setup_screen.dart';
+import '../features/twin/presentation/health_setup_screen.dart';
 import '../features/twin/presentation/twin_profile_screen.dart';
 import 'routes.dart';
 
@@ -35,7 +35,11 @@ final GoRouter appRouter = GoRouter(
 
     _route(Routes.signIn, SignInScreen.new),
     _route(Routes.signUp, SignUpScreen.new),
-    _route(Routes.profileSetup, ProfileSetupScreen.new),
+    _route(Routes.healthSetup, HealthSetupScreen.new),
+    _route(
+      Routes.healthSetupEdit,
+      () => const HealthSetupScreen(isEditing: true),
+    ),
 
     _route(Routes.dashboard, HomeShell.new),
     _route(Routes.timeline, TimelineScreen.new),

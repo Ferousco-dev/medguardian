@@ -14,6 +14,8 @@ import '../../../shared/widgets/async_view.dart';
 import '../../../shared/widgets/section_card.dart';
 import '../../../shared/widgets/section_heading.dart';
 import '../../../shared/widgets/status_pill.dart';
+import '../domain/twin_completion.dart';
+import 'widgets/completion_card.dart';
 
 class TwinProfileScreen extends ConsumerWidget {
   const TwinProfileScreen({super.key});
@@ -47,11 +49,24 @@ class TwinProfileScreen extends ConsumerWidget {
             ),
             children: <Widget>[
               _IdentityCard(twin: value),
+              const SizedBox(height: AppSpacing.lg),
+              CompletionCard(
+                completion: TwinCompletion.of(value),
+                onComplete: () => context.push(Routes.healthSetupEdit),
+              ),
               const SizedBox(height: AppSpacing.xxl),
-              const SectionHeading(title: 'Body'),
+              SectionHeading(
+                title: 'Body',
+                actionLabel: 'Edit',
+                onAction: () => context.push(Routes.healthSetupEdit),
+              ),
               _BodyStats(twin: value),
               const SizedBox(height: AppSpacing.xxl),
-              const SectionHeading(title: 'Conditions'),
+              SectionHeading(
+                title: 'Conditions',
+                actionLabel: 'Edit',
+                onAction: () => context.push(Routes.healthSetupEdit),
+              ),
               _TagList(
                 items: value.conditions,
                 emptyLabel: 'No conditions recorded',
@@ -124,10 +139,7 @@ class _IdentityCard extends StatelessWidget {
                   children: <Widget>[
                     Text(twin.fullName, style: text.titleLarge),
                     const SizedBox(height: 2),
-                    Text(
-                      '${twin.age} years old, ${twin.sex.label.toLowerCase()}',
-                      style: text.bodyMedium,
-                    ),
+                    Text(_subtitle(twin), style: text.bodyMedium),
                   ],
                 ),
               ),
@@ -182,6 +194,16 @@ class _IdentityCard extends StatelessWidget {
     );
   }
 
+  static String _subtitle(DigitalTwin twin) {
+    final List<String> parts = <String>[
+      if (twin.age != null) '${twin.age} years old',
+      if (twin.sex != BiologicalSex.undisclosed) twin.sex.label.toLowerCase(),
+    ];
+    return parts.isEmpty
+        ? 'Add your details to complete your twin'
+        : parts.join(', ');
+  }
+
   static String _initials(String name) {
     final List<String> parts = name.trim().split(RegExp(r'\s+'));
     if (parts.isEmpty || parts.first.isEmpty) {
@@ -207,26 +229,30 @@ class _BodyStats extends StatelessWidget {
         children: <Widget>[
           _Row(
             label: 'Height',
-            value: '${twin.heightCm.toStringAsFixed(0)} cm',
+            value: twin.heightCm == null
+                ? 'Not set'
+                : '${twin.heightCm!.toStringAsFixed(0)} cm',
           ),
           const Divider(),
           _Row(
             label: 'Weight',
-            value: '${twin.weightKg.toStringAsFixed(1)} kg',
+            value: twin.weightKg == null
+                ? 'Not set'
+                : '${twin.weightKg!.toStringAsFixed(1)} kg',
           ),
           const Divider(),
           _Row(
             label: 'Body mass index',
-            value: twin.bmi.toStringAsFixed(1),
-            trailing: StatusPill(
-              label: _bmiLabel(twin.bmi),
-              tone: _bmiTone(twin.bmi),
-            ),
+            value: twin.bmi == null ? 'Not set' : twin.bmi!.toStringAsFixed(1),
+            trailing: twin.bmi == null
+                ? null
+                : StatusPill(
+                    label: _bmiLabel(twin.bmi!),
+                    tone: _bmiTone(twin.bmi!),
+                  ),
           ),
-          if (twin.bloodType != null) ...<Widget>[
-            const Divider(),
-            _Row(label: 'Blood type', value: twin.bloodType!),
-          ],
+          const Divider(),
+          _Row(label: 'Blood type', value: twin.bloodType ?? 'Not set'),
         ],
       ),
     );

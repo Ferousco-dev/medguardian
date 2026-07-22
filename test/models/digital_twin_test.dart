@@ -44,12 +44,24 @@ void main() {
     expect(twin.bmi, closeTo(22.32, 0.01));
   });
 
-  test('bmi is zero when height is missing rather than infinite', () {
+  test('bmi is null when height is missing rather than infinite', () {
     final DigitalTwin twin = twinBornOn(
       DateTime(1995, 4, 2),
     ).copyWith(heightCm: 0);
 
-    expect(twin.bmi, 0);
+    expect(twin.bmi, isNull);
+  });
+
+  test('age and bmi are null on a twin with no details yet', () {
+    const DigitalTwin bare = DigitalTwin(
+      id: 'twin_2',
+      did: 'did:onto:aaaa1111',
+      fullName: 'New User',
+    );
+
+    expect(bare.age, isNull);
+    expect(bare.bmi, isNull);
+    expect(bare.sex, BiologicalSex.undisclosed);
   });
 
   test('shortDid truncates the identifier tail', () {
