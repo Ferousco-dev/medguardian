@@ -48,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _next() {
     if (_isLastPage) {
-      _finish();
+      _start();
       return;
     }
     _controller.nextPage(
@@ -57,7 +57,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _finish() {
+  void _start() {
+    context.go(Routes.signUp);
+  }
+
+  void _skip() {
     context.go(Routes.signIn);
   }
 
@@ -84,8 +88,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   top: AppSpacing.sm,
                 ),
                 child: TextButton(
-                  onPressed: _finish,
-                  child: const Text('Skip'),
+                  onPressed: _skip,
+                  child: const Text('I have an account'),
                 ),
               ),
             ),

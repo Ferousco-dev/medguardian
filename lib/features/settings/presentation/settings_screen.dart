@@ -88,6 +88,12 @@ class SettingsScreen extends ConsumerWidget {
                     label: 'Emergency card',
                     onTap: () => context.push(Routes.emergency),
                   ),
+                  const Divider(),
+                  _Tile(
+                    icon: Icons.menu_book_outlined,
+                    label: 'Health library',
+                    onTap: () => context.push(Routes.guides),
+                  ),
                 ],
               ),
             ),

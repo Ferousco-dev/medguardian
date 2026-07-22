@@ -13,11 +13,15 @@ import '../../../data/models/risk_score.dart';
 import '../../../shared/widgets/async_view.dart';
 import '../../../shared/widgets/metric_tile.dart';
 import '../../../shared/widgets/section_heading.dart';
+import '../../../shared/widgets/section_card.dart';
+import '../../../shared/widgets/skeleton.dart';
 import '../../../data/demo/demo_guides.dart';
 import '../../../data/models/health_guide.dart';
 import '../../../shared/widgets/status_pill.dart';
 import '../../guides/presentation/widgets/guide_card.dart';
 import '../../shell/application/shell_tab.dart';
+import '../../twin/domain/twin_completion.dart';
+import '../../twin/presentation/widgets/completion_card.dart';
 import 'widgets/insight_card.dart';
 import 'widgets/quick_actions.dart';
 import 'widgets/risk_score_card.dart';
@@ -72,11 +76,27 @@ class DashboardScreen extends ConsumerWidget {
             ),
             children: <Widget>[
               _Greeting(twin: twin),
+              if (twin.valueOrNull != null) ...<Widget>[
+                Builder(
+                  builder: (BuildContext context) {
+                    final TwinCompletion completion = TwinCompletion.of(
+                      twin.value!,
+                    );
+                    if (completion.isComplete) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(top: AppSpacing.xl),
+                      child: _CompletionNudge(completion: completion),
+                    );
+                  },
+                ),
+              ],
               const SizedBox(height: AppSpacing.xxl),
               AsyncView<RiskScore>(
                 value: risk,
                 onRetry: () => ref.invalidate(riskScoreProvider),
-                loading: const _CardSkeleton(height: 190),
+                loading: const Skeleton(height: 190),
                 data: (RiskScore value) => RiskScoreCard(
                   score: value,
                   onTap: () => context.push(Routes.riskScore),
@@ -95,7 +115,7 @@ class DashboardScreen extends ConsumerWidget {
               AsyncView<List<Biomarker>>(
                 value: biomarkers,
                 onRetry: () => ref.invalidate(biomarkersProvider),
-                loading: const _CardSkeleton(height: 220),
+                loading: const SkeletonGrid(),
                 data: (List<Biomarker> value) => _VitalsGrid(
                   onTapTile: () => ref
                       .read(shellTabProvider.notifier)
@@ -116,7 +136,7 @@ class DashboardScreen extends ConsumerWidget {
               AsyncView<List<HealthInsight>>(
                 value: insights,
                 onRetry: () => ref.invalidate(insightsProvider),
-                loading: const _CardSkeleton(height: 160),
+                loading: const Skeleton(height: 160),
                 data: (List<HealthInsight> value) {
                   if (value.isEmpty) {
                     return const EmptyState(
@@ -270,23 +290,6 @@ class _VitalsGrid extends StatelessWidget {
   }
 }
 
-class _CardSkeleton extends StatelessWidget {
-  const _CardSkeleton({required this.height});
-
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-    );
-  }
-}
-
 class _GuideCarousel extends StatelessWidget {
   const _GuideCarousel();
 
@@ -308,6 +311,49 @@ class _GuideCarousel extends StatelessWidget {
           guide: guides[index],
           onTap: () => context.push('\${Routes.guides}/\${guides[index].id}'),
         ),
+      ),
+    );
+  }
+}
+
+class _CompletionNudge extends StatelessWidget {
+  const _CompletionNudge({required this.completion});
+
+  final TwinCompletion completion;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+
+    return SectionCard(
+      onTap: () => context.push(Routes.healthSetupEdit),
+      color: AppColors.primaryTint,
+      borderColor: AppColors.primaryTint,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Row(
+        children: <Widget>[
+          CompletionRing(fraction: completion.fraction, size: 40),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text('Finish setting up your twin', style: text.titleSmall),
+                const SizedBox(height: 2),
+                Text(
+                  'Add your ${completion.next!.label.toLowerCase()} to sharpen '
+                  'your score',
+                  style: text.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.chevron_right_rounded,
+            size: 20,
+            color: AppColors.primary,
+          ),
+        ],
       ),
     );
   }
