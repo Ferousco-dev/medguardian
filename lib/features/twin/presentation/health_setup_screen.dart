@@ -179,7 +179,7 @@ class _HealthSetupScreenState extends ConsumerState<HealthSetupScreen> {
         ),
         actions: <Widget>[
           if (!widget.isEditing)
-            TextButton(onPressed: _leave, child: const Text('Skip for now')),
+            TextButton(onPressed: _leave, child: const Text('Do this later')),
           const SizedBox(width: AppSpacing.sm),
         ],
       ),
@@ -217,6 +217,7 @@ class _HealthSetupScreenState extends ConsumerState<HealthSetupScreen> {
                 onPageChanged: (int index) => setState(() => _step = index),
                 children: <Widget>[
                   _StepBody(
+                    step: 1,
                     title: 'The basics',
                     body:
                         'Age and sex change how your biomarkers are read. '
@@ -261,6 +262,7 @@ class _HealthSetupScreenState extends ConsumerState<HealthSetupScreen> {
                     ],
                   ),
                   _StepBody(
+                    step: 2,
                     title: 'Your body',
                     body:
                         'Height and weight give your twin a BMI to track, '
@@ -309,6 +311,7 @@ class _HealthSetupScreenState extends ConsumerState<HealthSetupScreen> {
                     ],
                   ),
                   _StepBody(
+                    step: 3,
                     title: 'Your history',
                     body:
                         'This is what lets MedGuardian read a symptom in '
@@ -395,11 +398,13 @@ class _HealthSetupScreenState extends ConsumerState<HealthSetupScreen> {
 
 class _StepBody extends StatelessWidget {
   const _StepBody({
+    required this.step,
     required this.title,
     required this.body,
     required this.children,
   });
 
+  final int step;
   final String title;
   final String body;
   final List<Widget> children;
@@ -416,10 +421,20 @@ class _StepBody extends StatelessWidget {
         AppSpacing.xxl,
       ),
       children: <Widget>[
+        Text(
+          'Step $step of 3',
+          style: text.labelMedium?.copyWith(color: AppColors.primary),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         Text(title, style: text.headlineSmall),
         const SizedBox(height: AppSpacing.sm),
-        Text(body, style: text.bodyMedium),
-        const SizedBox(height: AppSpacing.xxl),
+        Text(
+          body,
+          style: text.bodyLarge?.copyWith(color: AppColors.textSecondary),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        const Divider(),
+        const SizedBox(height: AppSpacing.xl),
         ...children,
       ],
     );
