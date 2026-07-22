@@ -17,11 +17,11 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
-  static const Duration _hold = Duration(milliseconds: 1800);
+  static const Duration _hold = Duration(milliseconds: 1600);
 
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 700),
+    duration: const Duration(milliseconds: 650),
   );
 
   late final Animation<double> _fade = CurvedAnimation(
@@ -29,9 +29,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     curve: Curves.easeOut,
   );
 
-  late final Animation<Offset> _rise = Tween<Offset>(
-    begin: const Offset(0, 0.12),
-    end: Offset.zero,
+  late final Animation<double> _scale = Tween<double>(
+    begin: 0.94,
+    end: 1,
   ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
   @override
@@ -68,33 +68,53 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            const Spacer(),
-            FadeTransition(
-              opacity: _fade,
-              child: SlideTransition(
-                position: _rise,
-                child: Column(
-                  children: <Widget>[
-                    const BrandMark(size: 84),
-                    const SizedBox(height: AppSpacing.xxl),
-                    Text('MedGuardian', style: text.headlineMedium),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text('Your health, watched over', style: text.bodyMedium),
-                  ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page),
+          child: Stack(
+            children: <Widget>[
+              Center(
+                child: FadeTransition(
+                  opacity: _fade,
+                  child: ScaleTransition(
+                    scale: _scale,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        const BrandMark(size: 88),
+                        const SizedBox(height: AppSpacing.xxl),
+                        Text(
+                          'MedGuardian',
+                          textAlign: TextAlign.center,
+                          style: text.headlineMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'Your health, watched over',
+                          textAlign: TextAlign.center,
+                          style: text.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
-              child: Text(
-                'Powered by Ontomorph Digital Twin',
-                style: text.bodySmall,
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
+                  child: FadeTransition(
+                    opacity: _fade,
+                    child: Text(
+                      'Powered by Ontomorph Digital Twin',
+                      textAlign: TextAlign.center,
+                      style: text.bodySmall,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
