@@ -172,12 +172,41 @@ class BiomarkerCard extends StatelessWidget {
           if (biomarker.referenceLow != null ||
               biomarker.referenceHigh != null) ...<Widget>[
             const SizedBox(height: AppSpacing.lg),
-            Text(
-              'Reference range '
-              '${_format(biomarker.referenceLow)} to '
-              '${_format(biomarker.referenceHigh)} ${biomarker.unit}, '
-              'from HOLON for your age and sex',
-              style: text.bodySmall,
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              decoration: BoxDecoration(
+                color: biomarker.isOutOfRange
+                    ? AppColors.dangerTint
+                    : AppColors.successTint,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Icon(
+                    biomarker.isOutOfRange
+                        ? Icons.error_outline_rounded
+                        : Icons.check_circle_outline_rounded,
+                    size: 14,
+                    color: biomarker.isOutOfRange
+                        ? AppColors.danger
+                        : AppColors.success,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      '${biomarker.isOutOfRange ? 'Outside' : 'Inside'} the '
+                      'healthy range of ${_format(biomarker.referenceLow)} to '
+                      '${_format(biomarker.referenceHigh)} ${biomarker.unit}, '
+                      'from HOLON for your age and sex',
+                      style: text.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ],
