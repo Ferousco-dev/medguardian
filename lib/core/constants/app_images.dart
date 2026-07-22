@@ -14,6 +14,19 @@ abstract final class AppImages {
     'https://images.unsplash.com/photo-1582750433449-648ed127bb54',
   ];
 
+  static const String bloodPressureMonitor =
+      'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0';
+  static const String walking =
+      'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8';
+  static const String balancedMeal =
+      'https://images.unsplash.com/photo-1512621776951-a57141f2eefd';
+  static const String sleep =
+      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55';
+  static const String hydration =
+      'https://images.unsplash.com/photo-1548839140-29a749e1cf4d';
+  static const String glucoseCheck =
+      'https://images.unsplash.com/photo-1631815587646-b85a1bb027e1';
+
   static String sized(String url, {int width = 800, int quality = 70}) {
     return '$url?auto=format&fit=crop&w=$width&q=$quality';
   }
