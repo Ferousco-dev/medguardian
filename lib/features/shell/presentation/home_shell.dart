@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../biomarkers/presentation/biomarkers_screen.dart';
 import '../../dashboard/presentation/dashboard_screen.dart';
 import '../../timeline/presentation/timeline_screen.dart';
 import '../../twin/presentation/twin_profile_screen.dart';
+import '../application/shell_tab.dart';
 
-class HomeShell extends StatefulWidget {
-  const HomeShell({super.key, this.initialIndex = 0});
-
-  final int initialIndex;
-
-  @override
-  State<HomeShell> createState() => _HomeShellState();
-}
-
-class _HomeShellState extends State<HomeShell> {
-  late int _index = widget.initialIndex;
+class HomeShell extends ConsumerWidget {
+  const HomeShell({super.key});
 
   static const List<Widget> _tabs = <Widget>[
     DashboardScreen(),
@@ -49,16 +42,20 @@ class _HomeShellState extends State<HomeShell> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ShellTab tab = ref.watch(shellTabProvider);
+
     return Scaffold(
-      body: IndexedStack(index: _index, children: _tabs),
+      body: IndexedStack(index: tab.index, children: _tabs),
       bottomNavigationBar: DecoratedBox(
         decoration: const BoxDecoration(
           border: Border(top: BorderSide(color: AppColors.border)),
         ),
         child: BottomNavigationBar(
-          currentIndex: _index,
-          onTap: (int index) => setState(() => _index = index),
+          currentIndex: tab.index,
+          onTap: (int index) => ref
+              .read(shellTabProvider.notifier)
+              .select(ShellTab.values[index]),
           items: _items,
         ),
       ),

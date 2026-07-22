@@ -13,7 +13,11 @@ import '../../../data/models/risk_score.dart';
 import '../../../shared/widgets/async_view.dart';
 import '../../../shared/widgets/metric_tile.dart';
 import '../../../shared/widgets/section_heading.dart';
+import '../../../data/demo/demo_guides.dart';
+import '../../../data/models/health_guide.dart';
 import '../../../shared/widgets/status_pill.dart';
+import '../../guides/presentation/widgets/guide_card.dart';
+import '../../shell/application/shell_tab.dart';
 import 'widgets/insight_card.dart';
 import 'widgets/quick_actions.dart';
 import 'widgets/risk_score_card.dart';
@@ -84,13 +88,18 @@ class DashboardScreen extends ConsumerWidget {
               SectionHeading(
                 title: 'Your vitals',
                 actionLabel: 'See all',
-                onAction: () => context.push(Routes.biomarkers),
+                onAction: () => ref
+                    .read(shellTabProvider.notifier)
+                    .select(ShellTab.biomarkers),
               ),
               AsyncView<List<Biomarker>>(
                 value: biomarkers,
                 onRetry: () => ref.invalidate(biomarkersProvider),
                 loading: const _CardSkeleton(height: 220),
                 data: (List<Biomarker> value) => _VitalsGrid(
+                  onTapTile: () => ref
+                      .read(shellTabProvider.notifier)
+                      .select(ShellTab.biomarkers),
                   biomarkers: value
                       .where(
                         (Biomarker b) => _pinnedBiomarkers.contains(b.code),
@@ -128,6 +137,13 @@ class DashboardScreen extends ConsumerWidget {
                   );
                 },
               ),
+              const SizedBox(height: AppSpacing.xxxl),
+              SectionHeading(
+                title: 'Worth reading',
+                actionLabel: 'Library',
+                onAction: () => context.push(Routes.guides),
+              ),
+              const _GuideCarousel(),
             ],
           ),
         ),
@@ -184,9 +200,10 @@ class _Greeting extends StatelessWidget {
 }
 
 class _VitalsGrid extends StatelessWidget {
-  const _VitalsGrid({required this.biomarkers});
+  const _VitalsGrid({required this.biomarkers, required this.onTapTile});
 
   final List<Biomarker> biomarkers;
+  final VoidCallback onTapTile;
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +236,7 @@ class _VitalsGrid extends StatelessWidget {
           sparkline: biomarker.readings
               .map((BiomarkerReading r) => r.value)
               .toList(growable: false),
-          onTap: () => context.push(Routes.biomarkers),
+          onTap: onTapTile,
         );
       },
     );
@@ -265,6 +282,32 @@ class _CardSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+    );
+  }
+}
+
+class _GuideCarousel extends StatelessWidget {
+  const _GuideCarousel();
+
+  @override
+  Widget build(BuildContext context) {
+    final List<HealthGuide> guides = DemoGuides.all
+        .take(4)
+        .toList(growable: false);
+
+    return SizedBox(
+      height: 236,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        padding: EdgeInsets.zero,
+        itemCount: guides.length,
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
+        itemBuilder: (BuildContext context, int index) => GuideCard(
+          guide: guides[index],
+          onTap: () => context.push('\${Routes.guides}/\${guides[index].id}'),
+        ),
       ),
     );
   }

@@ -10,6 +10,7 @@ import '../../../shared/widgets/section_card.dart';
 import '../../../shared/widgets/section_heading.dart';
 import '../../../shared/widgets/status_pill.dart';
 import '../../auth/application/auth_controller.dart';
+import '../../shell/application/shell_tab.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -70,7 +71,10 @@ class SettingsScreen extends ConsumerWidget {
                   _Tile(
                     icon: Icons.person_outline_rounded,
                     label: 'Digital twin profile',
-                    onTap: () => context.push(Routes.twin),
+                    onTap: () {
+                      ref.read(shellTabProvider.notifier).select(ShellTab.twin);
+                      context.pop();
+                    },
                   ),
                   const Divider(),
                   _Tile(

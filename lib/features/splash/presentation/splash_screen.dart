@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/brand_mark.dart';
+import '../../auth/application/auth_controller.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   static const Duration _hold = Duration(milliseconds: 1800);
 
@@ -40,11 +42,17 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _scheduleNext() async {
-    await Future<void>.delayed(_hold);
+    final List<Object?> results = await Future.wait(<Future<Object?>>[
+      Future<void>.delayed(_hold),
+      ref.read(authControllerProvider.future),
+    ]);
+
     if (!mounted) {
       return;
     }
-    context.go(Routes.onboarding);
+
+    final bool isSignedIn = results[1] != null;
+    context.go(isSignedIn ? Routes.dashboard : Routes.onboarding);
   }
 
   @override

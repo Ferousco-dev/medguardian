@@ -5,6 +5,8 @@ import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/biomarkers/presentation/biomarkers_screen.dart';
 import '../features/emergency/presentation/emergency_screen.dart';
+import '../features/guides/presentation/guide_detail_screen.dart';
+import '../features/guides/presentation/guides_screen.dart';
 import '../features/hospitals/presentation/hospitals_screen.dart';
 import '../features/medications/presentation/medications_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
@@ -54,5 +56,17 @@ final GoRouter appRouter = GoRouter(
     _route(Routes.emergency, EmergencyScreen.new),
     _route(Routes.hospitals, HospitalsScreen.new),
     _route(Routes.clinicalSummary, ClinicalSummaryScreen.new),
+    GoRoute(
+      path: Routes.guides,
+      builder: (BuildContext context, GoRouterState state) =>
+          const GuidesScreen(),
+      routes: <RouteBase>[
+        GoRoute(
+          path: ':id',
+          builder: (BuildContext context, GoRouterState state) =>
+              GuideDetailScreen(guideId: state.pathParameters['id'] ?? ''),
+        ),
+      ],
+    ),
   ],
 );

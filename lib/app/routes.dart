@@ -21,6 +21,7 @@ abstract final class Routes {
   static const String emergency = '/emergency';
   static const String hospitals = '/hospitals';
   static const String clinicalSummary = '/clinical-summary';
+  static const String guides = '/guides';
 
   const Routes._();
 }
